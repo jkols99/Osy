@@ -1,0 +1,10 @@
+kernel adt/list1
+kernel adt/list2
+kernel basic/dump_function
+kernel basic/probe_memory
+kernel basic/stack_pointer
+kernel printk/char
+kernel printk/hex
+kernel printk/int
+kernel printk/list
+kernel printk/string
