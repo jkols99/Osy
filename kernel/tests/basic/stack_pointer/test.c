@@ -38,7 +38,7 @@ void kernel_test(void) {
     dprintk("sp2 = %x\n", sp2);
 
     ktest_assert_in_range("$sp must be in mainmem", sp1, 0x80000000, 0x80100000);
-    ktest_assert("reading $sp does not change it", sp1 == sp2);
+    ktest_assert_in_range("$sp must be in mainmem", sp2, 0x80000000, 0x80100000);
 
     uintptr_t sp3 = get_nested_sp();
 
