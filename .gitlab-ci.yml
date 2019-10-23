@@ -7,3 +7,7 @@ image: mffd3s/nswi004-mips32:latest
 assignment-01:
   script:
     - ./tools/tester.py suite --verbose suite_as1.txt
+
+assignment-02:
+  script:
+    - ./tools/tester.py suite --verbose suite_as2.txt

@@ -1,0 +1,8 @@
+kernel heap/basic
+kernel heap/exhaust1:m256
+kernel heap/exhaust1:m4096
+kernel heap/exhaust2:m256
+kernel heap/exhaust2:m4096
+kernel heap/stress:m256
+kernel heap/stress:m1024
+kernel heap/stress:m4096

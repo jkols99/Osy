@@ -1,10 +1,16 @@
 kernel adt/list1
 kernel adt/list2
 kernel basic/dump_function
-kernel basic/probe_memory
+kernel basic/probe_memory:m32
+kernel basic/probe_memory:m128
+kernel basic/probe_memory:m256
+kernel basic/probe_memory:m1024
+kernel basic/probe_memory:m16384
+kernel basic/probe_memory:m131072
 kernel basic/stack_pointer
 kernel printk/char
 kernel printk/hex
 kernel printk/int
 kernel printk/list
 kernel printk/string
+kernel printk/uint

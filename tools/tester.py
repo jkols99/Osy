@@ -112,14 +112,26 @@ def prepare_empty_build_dir(test_name):
     return dir_name
 
 
-def run_kernel_test(name):
+def run_kernel_test(test_descriptor):
+    parts = test_descriptor.split(':')
+    name = parts[0]
+
+    if (len(parts) > 1) and parts[1].startswith('m'):
+        memory_size = int(parts[1][1:])
+    else:
+        memory_size = None
+
     logger = logging.getLogger('K/{}'.format(name))
-    build_dir = prepare_empty_build_dir('kernel/{}'.format(name))
+    build_dir = prepare_empty_build_dir('kernel/{}'.format(test_descriptor))
     logger.debug('Will use build directory %s.', build_dir)
 
-    logger.info('Configuring ...')
+    configure_args = ['--kernel-test={}'.format(name)]
+    if memory_size is not None:
+        configure_args.append('--memory-size={}'.format(memory_size))
+
+    logger.info('Configuring (%s)...', ' '.join(configure_args))
     (exit_code, _) = run_command_with_logging(
-        ['../configure.py', '--verbose', '--kernel-test={}'.format(name)],
+        ['../configure.py', '--verbose'] + configure_args,
         build_dir,
         os.path.join(build_dir, 'configure.log'),
         logger,
