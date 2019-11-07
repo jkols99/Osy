@@ -87,7 +87,7 @@ size_t push_first(size_t size) {
     }
 
     size_t current_address = heap.arr[0].address + heap.arr[0].mem_amount;
-    
+
     heap.arr[1] = (struct mem_chunk) { size, current_address };
 
     heap.last_index++;
