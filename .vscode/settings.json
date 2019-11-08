@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "Makefile": "c",
+        "printer.h": "c",
+        "main.h": "c",
+        "ktest.h": "c"
+    }
+}
