@@ -25,6 +25,11 @@ void printk(const char* format, ...) {
                 char* string_to_print = va_arg(argp, char*);
                 print_string(string_to_print);
             }
+            if (*it == 'u') {
+                unsigned int usigned = va_arg(argp, unsigned int);
+                char targets[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+                print_int(usigned, targets, 10, false);
+            }
             if (*it == 'x') {
                 const unsigned int uint = va_arg(argp, const unsigned int);
                 char targets[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
@@ -57,31 +62,27 @@ void printk(const char* format, ...) {
                     printer_putchar('0');
                     printer_putchar('x');
                     print_int(head, targets, 16, false);
-                    list_t* list = (list_t*) head;
+                    list_t* list = (list_t*)head;
                     link_t* curr = list->head.next;
                     size_t ln = list_get_size(list);
-                    if(ln > 0)
-                    {
+                    if (ln > 0) {
                         printer_putchar('[');
                         print_int(ln, targets, 10, false);
                         printer_putchar(':');
                         printer_putchar(' ');
-                        for (size_t i = 0; i < ln; i++)
-                        {
+                        for (size_t i = 0; i < ln; i++) {
                             printer_putchar('0');
                             printer_putchar('x');
                             print_int((int)curr, targets, 16, false);
-                            if (i+1 != ln)
+                            if (i + 1 != ln)
                                 printer_putchar('-');
                             curr = curr->next;
                         }
                         printer_putchar(']');
-                    }
-                    else
-                    {
+                    } else {
                         print_string("[empty]");
                     }
-                    
+
                 } else {
                     const unsigned int pointer_to_print = va_arg(argp, const unsigned int);
                     printer_putchar('0');
