@@ -18,6 +18,7 @@ void kernel_main(void) {
 #ifdef KERNEL_TEST
     kernel_test();
 #else
+    printk("Kernel end: %d", _kernel_end);
     printer_putchar('H');
     printer_putchar('e');
     printer_putchar('l');

@@ -53,18 +53,35 @@ void printk(const char* format, ...) {
                 it++;
                 char targets[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
                 if (*it == 'L') {
-                    list_t list = va_arg(argp, list_t);
-                    list_foreach(list, list_t, head, it) {
-                        printer_putchar('0');
-                        printer_putchar('x');
-                        print_int((int)it, targets, 16, false);
+                    unsigned int head = va_arg(argp, unsigned int);
+                    printer_putchar('0');
+                    printer_putchar('x');
+                    print_int(head, targets, 16, false);
+                    list_t* list = (list_t*) head;
+                    link_t* curr = list->head.next;
+                    size_t ln = list_get_size(list);
+                    if(ln > 0)
+                    {
+                        printer_putchar('[');
+                        print_int(ln, targets, 10, false);
+                        printer_putchar(':');
+                        printer_putchar(' ');
+                        for (size_t i = 0; i < ln; i++)
+                        {
+                            printer_putchar('0');
+                            printer_putchar('x');
+                            print_int((int)curr, targets, 16, false);
+                            if (i+1 != ln)
+                                printer_putchar('-');
+                            curr = curr->next;
+                        }
+                        printer_putchar(']');
                     }
-                    // while (list != NULL) {
-                    //     printer_putchar('0');
-                    //     printer_putchar('x');
-                    //     print_int((int)list, targets, 16, false);
-                    //     list++;
-                    // }
+                    else
+                    {
+                        print_string("[empty]");
+                    }
+                    
                 } else {
                     const unsigned int pointer_to_print = va_arg(argp, const unsigned int);
                     printer_putchar('0');

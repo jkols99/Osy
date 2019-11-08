@@ -13,7 +13,13 @@
  * @return Amount of memory available in bytes.
  */
 size_t debug_get_base_memory_size(void) {
-    uintptr_t stack = (uintptr_t)debug_get_stack_pointer;
-    uintptr_t kernel = (uintptr_t)_kernel_end;
-    return &kernel - &stack;
+    
+    size_t total = 0;
+    
+    char* start = (char*)&_kernel_end + 1;
+
+    while ( *start++ != -1)
+        total += 1;
+
+    return total;
 }
