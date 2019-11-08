@@ -16,13 +16,12 @@ static void item_init(item_t* item, int value) {
 
 #define CHECK_LIST_CONTENTS(size, list, ...) \
     do { \
-        ktest_assert(list_get_size(&list) == size, "list not " #size " but %d", list_get_size(&list)); \
+        ktest_assert("list size is" #size, list_get_size(&list) == size); \
         int _expected_values[] = { __VA_ARGS__ }; \
         if (size > 0) { \
             int _i = 0; \
             list_foreach(list, item_t, link, _it) { \
-                ktest_assert(_it->value == _expected_values[_i], \
-                        "[%d]: not %d but %d", _i, _expected_values[_i], _it->value); \
+                ktest_assert("checking item", _it->value == _expected_values[_i]); \
                 _i++; \
             } \
         } \
@@ -57,7 +56,7 @@ void kernel_test(void) {
     CHECK_LIST_CONTENTS(4, items, 1, 2, 4, 3);
 
     item_t* item = list_item(rotated, item_t, link);
-    ktest_assert(item->value == 3, "rotated item is not 3 but %d", item->value);
+    ktest_assert("rotated item is c", item->value == 3);
 
     list_remove(&b.link);
     CHECK_LIST_CONTENTS(3, items, 1, 4, 3);
@@ -65,7 +64,7 @@ void kernel_test(void) {
     link_t* popped = list_pop(&items);
     CHECK_LIST_CONTENTS(2, items, 4, 3);
     item = list_item(popped, item_t, link);
-    ktest_assert(item->value == 1, "popped item is not 1 but %d", item->value);
+    ktest_assert("popped item is a", item->value == 1);
 
     ktest_passed();
 }

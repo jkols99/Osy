@@ -15,4 +15,9 @@
  */
 void debug_dump_function(const char* name, uintptr_t address, size_t instruction_count) {
     printk("%x <%s>:\n", address, name);
+    int* add = (int*)address;
+    for (size_t i = 0; i < instruction_count; i++) {
+        printk("%x:        %a\n", add, *add);
+        add++;
+    }
 }

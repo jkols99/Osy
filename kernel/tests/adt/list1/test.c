@@ -31,16 +31,16 @@ void kernel_test(void) {
     list_t paws;
     list_init(&paws);
 
-    ktest_assert(list_is_empty(&paws), "list shall be empty");
-    ktest_assert(list_get_size(&paws) == 0, "list shall be empty (but has %d items)", list_get_size(&paws));
+    ktest_assert("list is empty", list_is_empty(&paws));
+    ktest_assert("size is 0", list_get_size(&paws) == 0);
 
     list_append(&paws, &marshall.link);
-    ktest_assert(!list_is_empty(&paws), "list shall not be empty");
-    ktest_assert(list_get_size(&paws) == 1, "list shall have one items (but has %d items)", list_get_size(&paws));
+    ktest_assert("list is not empty", !list_is_empty(&paws));
+    ktest_assert("size is 1", list_get_size(&paws) == 1);
 
     list_append(&paws, &chase.link);
     list_append(&paws, &skye.link);
-    ktest_assert(list_get_size(&paws) == 3, "list shall have 3 items (but has %d items)", list_get_size(&paws));
+    ktest_assert("size is 3", list_get_size(&paws) == 3);
 
     ktest_passed();
 }

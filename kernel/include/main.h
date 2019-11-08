@@ -8,12 +8,7 @@
 
 void kernel_main(void);
 
-/** Address at the kernel end
- *
- * The address is defined in the linker script, the actual value is provided during linking.
- * The type of the symbol (a zero length array of bytes) is chosen to suggest that there
- * may be some bytes there but we do not know how many.
- */
-extern uint8_t _kernel_end [0];
+/* See definition in kernel linker script. */
+extern uint8_t* _kernel_end;
 
 #endif
