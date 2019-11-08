@@ -4,7 +4,6 @@
 #include <drivers/printer.h>
 #include <ktest.h>
 #include <main.h>
-#include <mm/heap.h>
 
 /** This is kernel C-entry point.
  *
@@ -17,10 +16,8 @@
  */
 void kernel_main(void) {
 #ifdef KERNEL_TEST
-    heap_init();
     kernel_test();
 #else
-    printk("Kernel end: %d", _kernel_end);
     printer_putchar('H');
     printer_putchar('e');
     printer_putchar('l');

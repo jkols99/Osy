@@ -22,27 +22,32 @@
 #define ktest_passed() \
     puts("\n\nTest passed.\n\n")
 
-/** Print message about passed failed test. */
+/** Print message about passed failed test and halts the CPU. */
 #define ktest_failed() \
-    puts("\n\nTest failed.\n\n")
+    do { \
+        puts("\n\nTest failed.\n\n"); \
+        machine_halt(); \
+    } while (0)
 
 /** Kernel test assertion.
  *
  * Unlike normal assertion, this one is always checked and machine is
  * terminated when expr does not evaluate to true.
  */
-#define ktest_assert(msg, expr) \
+#define ktest_assert(expr, fmt, ...) \
     do { \
         if (!(expr)) { \
-            puts("Kernel test assertion `" msg "' failed at " __FILE__ ":" QUOTE_ME(__LINE__) ": " #expr); \
+            puts("\n\n" __FILE__ ":" QUOTE_ME(__LINE__) ": Kernel test assertion failed: " #expr); \
+            printk(__FILE__ ":" QUOTE_ME(__LINE__) ": " fmt "\n", ##__VA_ARGS__); \
             ktest_failed(); \
-            machine_halt(); \
         } \
     } while (0)
 
 /** Kernel test assertion for bound checking. */
 #define ktest_assert_in_range(msg, value, lower, upper) \
-    ktest_assert(msg, ((value) >= (lower)) && ((value) <= (upper)))
+    ktest_assert(((value) >= (lower)) && ((value) <= (upper)), \
+            #value "=%d not in [" #lower "=%d, " #upper "=%d] range", \
+            value, lower, upper)
 
 /** All kernel test share this signature as only one test is compiled at a time. */
 void kernel_test(void);

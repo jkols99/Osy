@@ -38,15 +38,16 @@ void kernel_test(void) {
     dprintk("sp2 = %x\n", sp2);
 
     ktest_assert_in_range("$sp must be in mainmem", sp1, 0x80000000, 0x80100000);
-    ktest_assert("reading $sp does not change it", sp1 == sp2);
+    ktest_assert(sp1 == sp2, "$sp unexpectedly changed (0x%x => 0x%x)", sp1, sp2);
 
     uintptr_t sp3 = get_nested_sp();
 
     dprintk("sp3 = %x\n", sp3);
 
     ktest_assert_in_range("$sp must be in mainmen", sp3, 0x80000000, 0x80100000);
-    ktest_assert("caller decreases $sp", sp3 < sp2);
-    ktest_assert("stack frame is not overly big", sp2 - MAX_STACK_FRAME < sp3);
+    ktest_assert(sp3 < sp2, "caller shall decrease $sp (0x%x => 0x%x)", sp2, sp3);
+    ktest_assert(sp2 - MAX_STACK_FRAME < sp3, "stack frame is too big (0x%x, %dB => 0x%x)",
+            sp2, MAX_STACK_FRAME, sp3);
 
     ktest_passed();
 }
