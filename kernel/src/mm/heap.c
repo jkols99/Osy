@@ -22,8 +22,8 @@ void* kmalloc(size_t size) {
     new_mem->next = NULL;
     temp->next = new_mem;
     void* address = (void*)debug_get_stack_pointer();
-//    int ret;
-//    __asm__ volatile("addi $29 $29 %1;" : "=r"(ret) : "r"(size));
+    int ret;
+    __asm__ volatile("add $sp, %1, $sp;" : "=r"(ret) : "r"(size));
     return address;
 }
 
@@ -40,9 +40,9 @@ void kfree(void* ptr) {
     if (temp == 0) return;
     // remove element from linked list
     before->next = temp->next;
-//    int amount_of_memory_to_free = (int)temp->mem_amount;
-//    int ret;
-//    __asm__ volatile("sub $29 %1 $29;" : "=r"(ret) : "r"(amount_of_memory_to_free));
+    int amount_of_memory_to_free = (int)temp->mem_amount;
+    int ret;
+    __asm__ volatile("sub $sp, %1, $sp;" : "=r"(ret) : "r"(amount_of_memory_to_free));
 }
 
 void heap_init(void) {
