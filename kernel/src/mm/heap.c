@@ -6,12 +6,6 @@
 #include <debug/code.h>
 #include <debug/mm.h>
 
-typedef struct Item {
-    struct Item* next;
-    size_t mem_amount;
-} mem_chunk;
-
-mem_chunk* head;
 mem_chunk* new_mem;
 
 void* kmalloc(size_t size) {
@@ -19,34 +13,37 @@ void* kmalloc(size_t size) {
         return NULL;
     }
 
-    mem_chunk* temp = head;
-    while (temp->next != NULL) {
-        temp = temp->next;
-    }
-    new_mem->mem_amount = size;
-    new_mem->next = NULL;
-    temp->next = new_mem;
-    void* address = (void*)debug_get_stack_pointer();
-    return address;
+    new_mem->amount = size;
+    new_mem->address = debug_get_stack_pointer();
+    heap_insert(new_mem);
+    return (void*)new_mem->address;
 }
 
 void kfree(void* ptr) {
-    int offset = (int)_kernel_end;
-    mem_chunk* temp = head;
-    mem_chunk* before = head;
-    int address = (int)ptr;
-    while (offset < address) {
-        offset += temp->mem_amount;
-        before = temp;
-        temp = temp->next;
-        if (temp == NULL) return;
-    }
-    if (temp == 0) return;
-    // remove element from linked list
-    before->next = temp->next;
+
 }
+mem_chunk* heap[debug_get_base_memory_size()];
+size_t last;
 
 void heap_init(void) {
-    head->mem_amount = 0;
-    head->next = NULL;
+    last = -1;
+}
+
+void heap_insert(mem_chunk* memChunk) {
+    last += 1;
+    heap[last] = memChunk;
+    bubble_up(last);
+}
+
+void bubble_up(size_t index) {
+    while (index > 1) {
+        mem_chunk* parent = heap[index / 2];
+        if (parent->address <= heap[index]->address) {
+            break;
+        }
+        mem_chunk* temp = parent;
+        parent = heap[index];
+        heap[index] = temp;
+        index = index / 2;
+    }
 }
