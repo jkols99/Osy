@@ -5,8 +5,12 @@
 #include <debug/mm.h>
 #include <main.h>
 #include <mm/heap.h>
+#include <types.h>
 
 void* kmalloc(size_t size) {
+    if (init == false)
+        heap_init();
+
     if (mem_left < size)
         return NULL;
 
@@ -43,4 +47,5 @@ void heap_init(void) {
     mem_left = debug_get_base_memory_size();
     head->mem_amount = 0;
     head->next = NULL;
+    init = true;
 }

@@ -11,6 +11,7 @@ typedef struct Item {
     size_t mem_amount;
 } mem_chunk;
 
+bool init;
 mem_chunk* head;
 mem_chunk* new_mem;
 size_t mem_left;
