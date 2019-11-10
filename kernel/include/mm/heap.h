@@ -6,17 +6,17 @@
 
 #include <types.h>
 
-void* kmalloc(size_t size);
-void kfree(void* ptr);
 typedef struct Item {
-    size_t address;
-    size_t amount;
+    struct Item* next;
+    size_t mem_amount;
 } mem_chunk;
 
+mem_chunk* head;
+mem_chunk* new_mem;
+size_t mem_left;
+
+void* kmalloc(size_t size);
+void kfree(void* ptr);
 void heap_init(void);
-void heap_insert(mem_chunk* memChunk);
-void heap_delete(size_t index);
-int heap_find(mem_chunk memChunk);
-void bubble_up(size_t last);
 
 #endif
