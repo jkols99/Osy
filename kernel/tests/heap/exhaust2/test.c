@@ -3,6 +3,7 @@
 
 #include "../theap.h"
 #include <ktest.h>
+#include <lib/print.h>
 #include <mm/heap.h>
 #include <types.h>
 
@@ -25,8 +26,13 @@ static size_t exhaust_and_free(void) {
     while (1) {
         // Stress proper alignment a little bit ;-)
         uintptr_t* ptr = kmalloc(allocation_size - 1);
+        if (ptr != NULL) {
+            printk("Allocating: %u\n", allocation_size - 1);
+            printk("Alligning to: %u\n", allocation_size);
+        }
         if (ptr == NULL) {
             allocation_size = allocation_size / 2;
+            printk("Lowering allocation size from %u to %u\n", allocation_size * 2, allocation_size);
             if (allocation_size < MIN_SIZE) {
                 break;
             }
@@ -35,8 +41,9 @@ static size_t exhaust_and_free(void) {
 
         ktest_check_kmalloc_result(ptr, allocation_size - 1);
         ktest_check_kmalloc_writable(ptr);
-
         allocation_count++;
+        if (allocation_count % 7 == 0)
+            printk("Allocation count: %u\n", allocation_count);
         if (allocation_count > MAX_ALLOCATIONS) {
             printk("Too many (%d) allocations succeeded.\n", allocation_count);
             ktest_failed();
@@ -47,6 +54,7 @@ static size_t exhaust_and_free(void) {
         ptr[0] = previous_block;
         previous_block = (uintptr_t)ptr;
     }
+    printk("Final allocation count: %u\n", allocation_count);
 
     dprintk("Freeing it back (starting at %x)\n", previous_block);
 
