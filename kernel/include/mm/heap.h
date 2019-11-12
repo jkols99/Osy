@@ -11,7 +11,7 @@ typedef struct mem_chunk {
     size_t address;
 } mem_chunk;
 
-#define ARR_LENGTH 120000
+#define ARR_LENGTH 2500
 #define UINT_MAX 1000000
 
 typedef struct my_heap {

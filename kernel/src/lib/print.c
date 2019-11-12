@@ -106,7 +106,7 @@ void printk(const char* format, ...) {
 
 void print_int(unsigned int n, char options[], int base, bool auto_add_zeros) {
     int counter = 0;
-    static char buffer[50];
+    char buffer[50];
     char* ptr;
     ptr = &buffer[49];
     *ptr = '\0';
