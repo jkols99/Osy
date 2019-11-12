@@ -22,6 +22,7 @@ typedef struct my_heap {
 bool init;
 struct my_heap heap;
 size_t mem_left;
+size_t biggest_free_block;
 
 void* kmalloc(size_t size);
 void kfree(void* ptr);
@@ -30,6 +31,8 @@ void heap_init(void);
 //linked list functions
 size_t push_back(size_t mem);
 size_t delete_chunk(size_t address);
+
+void countBiggestFreeBlock(void);
 void print_array(void);
 
 #endif

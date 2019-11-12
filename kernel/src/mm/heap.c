@@ -20,7 +20,8 @@ void* kmalloc(size_t size) {
 
     size_t allign_diff = (4 - (size % 4)) % 4;
     size += allign_diff;
-    if (mem_left < size) {
+    countBiggestFreeBlock();
+    if (biggest_free_block < size) {
         return NULL;
     }
     mem_left -= size;
@@ -39,6 +40,25 @@ void kfree(void* ptr) {
 //    print_array();
 }
 
+void countBiggestFreeBlock(void) {
+    size_t gap_sum = 0;
+    size_t biggest_gap = 0;
+    for (size_t i = 0; i < heap.last_index - 1; i++) {
+        size_t gap = heap.arr[i + 1].address - (heap.arr[i].address + heap.arr[i].mem_amount);
+        gap_sum += gap;
+        if (gap > biggest_gap) {
+            biggest_gap = gap;
+        }
+    }
+    size_t ending_mem = mem_left - gap_sum;
+    if (ending_mem > biggest_gap) {
+        biggest_free_block = ending_mem;
+    } else {
+        biggest_free_block = biggest_gap;
+    }
+
+}
+
 void heap_init(void) {
     //get total memory
     mem_left = debug_get_base_memory_size();
@@ -46,6 +66,7 @@ void heap_init(void) {
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
     init = true;
+    biggest_free_block = mem_left;
 }
 
 size_t push_back(size_t mem) {
