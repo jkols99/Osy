@@ -24,11 +24,17 @@ void* kmalloc(size_t size) {
         return NULL;
     }
     mem_left -= size;
+    size_t real_last_index = heap.last_index - 1;
+    printk("Dumping heap array from 0 to %u\n", real_last_index);
+    for (size_t i = 0; i < real_last_index; i++) {
+        printk("%u-th element with address %u and mem amount %u\n", i, heap.arr[i].address, heap.arr[i].mem_amount);
+    }
+    printk("Dumping ended\n\n");
 
-    size_t current_adress = heap.arr[heap.last_index].address + heap.arr[heap.last_index].mem_amount;
+    size_t current_adress = heap.arr[real_last_index].address + heap.arr[real_last_index].mem_amount;
     push_back(current_adress, size);
 
-    printk("Returing address: %u", current_adress);
+    printk("Returing address: %u\n", current_adress);
     return (void*)current_adress;
 }
 
@@ -49,7 +55,7 @@ void heap_init(void) {
     printk("Mem left: %u\n", mem_left);
     printk("Start add: %u\n", start_address);
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
-    heap.last_index = 0;
+    heap.last_index = 1;
     init = true;
 }
 
