@@ -12,6 +12,7 @@ typedef struct mem_chunk {
 } mem_chunk;
 
 #define ARR_LENGTH 120000
+#define UINT_MAX 1000000
 
 typedef struct my_heap {
     mem_chunk arr[ARR_LENGTH];
@@ -27,7 +28,8 @@ void kfree(void* ptr);
 void heap_init(void);
 
 //linked list functions
-void push_back(size_t address, size_t mem);
+size_t push_back(size_t mem);
 size_t delete_chunk(size_t address);
+void print_array(void);
 
 #endif
