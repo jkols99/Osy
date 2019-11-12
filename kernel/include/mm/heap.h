@@ -19,7 +19,6 @@ typedef struct my_heap {
     size_t last_index;
 } my_heap;
 
-bool init;
 struct my_heap heap;
 size_t mem_left;
 size_t biggest_free_block;
@@ -32,7 +31,7 @@ void heap_init(void);
 size_t push_back(size_t mem);
 size_t delete_chunk(size_t address);
 
-void countBiggestFreeBlock(void);
+void count_biggest_free_block(void);
 void print_array(void);
 
 #endif
