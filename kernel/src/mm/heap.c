@@ -13,47 +13,34 @@ void* kmalloc(size_t size) {
         heap_init();
 
     if (heap.last_index == ARR_LENGTH) {
-        printk("Heap is full...\n");
         return NULL;
     }
 
     size_t allign_diff = (4 - (size % 4)) % 4;
     size += allign_diff;
     if (mem_left < size) {
-        printk("Returning null pointer, mem_left was %u and size was %u\n", mem_left, size);
         return NULL;
     }
     mem_left -= size;
     size_t real_last_index = heap.last_index - 1;
-    printk("Dumping heap array from 0 to %u\n", real_last_index);
-    for (size_t i = 0; i < real_last_index; i++) {
-        printk("%u-th element with address %u and mem amount %u\n", i, heap.arr[i].address, heap.arr[i].mem_amount);
-    }
-    printk("Dumping ended\n\n");
 
     size_t current_adress = heap.arr[real_last_index].address + heap.arr[real_last_index].mem_amount;
     push_back(current_adress, size);
 
-    printk("Returing address: %u\n", current_adress);
+    // printk("Returing address: %u\n", current_adress);
     return (void*)current_adress;
 }
 
 void kfree(void* ptr) {
-    printk("Memory free starts...\n");
-
     size_t freed_memory = delete_chunk((size_t)ptr);
-    printk("Found %u memory to free...\n", freed_memory);
 
     mem_left += freed_memory;
-    printk("Memory free ends...\n\n");
 }
 
 void heap_init(void) {
     //get total memory
     mem_left = debug_get_base_memory_size();
     size_t start_address = (size_t)_kernel_end;
-    printk("Mem left: %u\n", mem_left);
-    printk("Start add: %u\n", start_address);
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
     init = true;
