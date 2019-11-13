@@ -14,10 +14,13 @@
 size_t debug_get_base_memory_size(void) {
     size_t total = 0;
     
-    char* start = (char*)&_kernel_end + 1;
+    volatile char* start = (char*)&_kernel_end + 1;
 
-    while ( *start++ != -1)
-        total += 1;
+    while ( *start != -1)
+    {
+        total += 1024;
+        start += 1024;
+    }
 
     return total;
 }

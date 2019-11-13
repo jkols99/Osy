@@ -23,7 +23,7 @@ void* kmalloc(size_t size) {
         return NULL;
     }
     mem_left -= size;
-    printk("Mem left was %u and now is %u, size allocated: %u\n", mem_left + size, mem_left, size);
+    // printk("Mem left was %u and now is %u, size allocated: %u\n", mem_left + size, mem_left, size);
     //gets new addreshis malloc
     size_t address = 0;
     if (biggest_gap_index == 0) {
@@ -60,8 +60,8 @@ size_t count_biggest_free_block(void) {
         }
     }
     size_t ending_mem = mem_left - gap_sum;
-    printk("Biggest gap index is: %u\n", biggest_gap_index);
-    printk("Total memory is: %u, biggest gap: %u and ending mem: %u\n",mem_left, biggest_gap, ending_mem);
+    // printk("Biggest gap index is: %u\n", biggest_gap_index);
+    // printk("Total memory is: %u, biggest gap: %u and ending mem: %u\n",mem_left, biggest_gap, ending_mem);
     //updates the biggest continuous block according to bigger value found
     if (ending_mem > biggest_gap) {
         return ending_mem;
@@ -74,8 +74,8 @@ size_t count_biggest_free_block(void) {
 void heap_init(void) {
     mem_left = debug_get_base_memory_size();
     size_t start_address = (size_t)&_kernel_end;
-    printk("Mem_left: %u\n Start address: %x\n\n", mem_left, start_address);
-    printk("Heap end: %x\n", mem_left + start_address);
+    // printk("Mem_left: %u\n Start address: %x\n\n", mem_left, start_address);
+    // printk("Heap end: %x\n", mem_left + start_address);
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
 }
@@ -112,10 +112,10 @@ size_t push_back(size_t mem) {
         size_t current_address = heap.arr[best_index - 1].address + heap.arr[best_index - 1].mem_amount;
         heap.arr[best_index] = (struct mem_chunk){ mem, current_address };
         heap.last_index++;
-        printk("IF: Ret address: %p\n", current_address);
+        // printk("IF: Ret address: %p\n", current_address);
         return current_address;
     } else {
-        printk("Best index is %u\n", best_index);
+        // printk("Best index is %u\n", best_index);
         //else push array left from best index and insert new memory chunk in
         for (size_t j = heap.last_index; j > best_index + 1; j--) {
             heap.arr[j] = heap.arr[j - 1];
@@ -123,7 +123,7 @@ size_t push_back(size_t mem) {
         size_t current_address = heap.arr[best_index].address + heap.arr[best_index].mem_amount;
         heap.last_index++;
         heap.arr[best_index + 1] = (struct mem_chunk){ mem, current_address };
-        printk("ELSE: Ret address: %p\n", current_address);
+        // printk("ELSE: Ret address: %p\n", current_address);
         return current_address;
     }
 }
