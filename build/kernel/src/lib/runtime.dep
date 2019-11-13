@@ -1,0 +1,3 @@
+src/lib/runtime.o: \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/src/lib/runtime.c \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/lib/runtime.h

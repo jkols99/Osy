@@ -1,0 +1,10 @@
+src/main.o: \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/src/main.c \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/drivers/printer.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/ktest.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/debug.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/drivers/machine.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/lib/print.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/types.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/main.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/mm/heap.h

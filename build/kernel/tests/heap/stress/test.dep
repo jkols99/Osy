@@ -1,0 +1,10 @@
+tests/heap/stress/test.o: \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/tests/heap/stress/test.c \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/tests/heap/stress/../theap.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/adt/list.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/debug.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/drivers/machine.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/lib/print.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/types.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/ktest.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/mm/heap.h

@@ -1,0 +1,5 @@
+src/debug/mm.o: \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/src/debug/mm.c \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/debug/mm.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/types.h \
+ /afs/ms.mff.cuni.cz/u/k/kolsovsj/osy/experimenting5/team-MatfYzo/kernel/include/main.h
