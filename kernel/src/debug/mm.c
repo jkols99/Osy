@@ -4,6 +4,8 @@
 #include <debug/mm.h>
 #include <main.h>
 
+#define CONST_INC 1024
+
 /** Probe available base physical memory.
  *
  * Do not check for non-continuous memory blocks or for memory available via
@@ -18,9 +20,9 @@ size_t debug_get_base_memory_size(void) {
 
     while ( *start != -1)
     {
-        total += 1024;
-        start += 1024;
+        total += CONST_INC;
+        start += CONST_INC;
     }
 
-    return total;
+    return total - CONST_INC;
 }
