@@ -32,7 +32,7 @@ size_t push_back(size_t mem);
 size_t push_first(size_t size);
 size_t delete_chunk(size_t address);
 
-void count_biggest_free_block(void);
+size_t count_biggest_free_block(void);
 void print_array(void);
 
 #endif

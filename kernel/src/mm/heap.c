@@ -44,7 +44,7 @@ void kfree(void* ptr) {
 }
 
 //updates biggest continouous block of memory
-void count_biggest_free_block(void) {
+size_t count_biggest_free_block(void) {
     size_t gap_sum = 0;
     size_t biggest_gap = 0;
     biggest_gap_index = UINT_MAX;
@@ -78,7 +78,6 @@ void heap_init(void) {
     printk("Heap end: %x\n", mem_left + start_address);
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
-    biggest_free_block = mem_left;
 }
 
 size_t push_first(size_t size) {
