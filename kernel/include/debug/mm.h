@@ -5,7 +5,7 @@
 #define _DEBUG_MM_H
 
 #include <types.h>
-#include CONST_INC 1024
+#define CONST_INC 1024
 
 size_t debug_get_base_memory_size(void);
 
