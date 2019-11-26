@@ -39,8 +39,8 @@ struct thread {
     void* data;
     void* stack;
     void* stack_top;
-    thread_t* waiting_for;
-    thread_t* is_waiting_for_me;
+    thread_t* following;
+    thread_t* follower;
 };
 
 void threads_init(void);

@@ -16,6 +16,49 @@ void threads_init(void) {
     //unneccessary...
 }
 
+static void* retvalue;
+
+/**
+ * Kills current thread, this function is either called 
+ * 1) After thread finishes naturally
+ * 2) Its forced to be killed via thread_finish
+ * Next thread is determined by:
+ * 1) Natural call of scheduler_schedule_next
+ * 2) Follower of thread being killed
+ * 
+ * Killed thread is removed from all dependencies in queue 
+ * and then from queue
+*/
+static void kill_thread(void) {
+        thread_t* thread_to_kill = get_current_thread();
+        thread_t* next_thread = NULL;
+
+        if (thread_to_kill->follower != NULL)
+            next_thread = thread_to_kill->follower;
+
+        remove_all_dependencies(queue, thread_to_kill);
+
+        scheduler_remove_thread(thread_to_kill);
+
+        kfree(thread_to_kill);
+        thread_to_kill = NULL;
+        if (next_thread == NULL)
+            scheduler_schedule_next();
+        else
+            thread_switch_to(next_thread);        
+}
+
+/**
+ * Wraps together entry function and kill function,
+ * so after thread finishes its entry function,
+ * it can proceed to get killed
+ */
+static void wrap(thread_t* new_thread)
+{
+    retvalue = (*new_thread->entry_func)(new_thread->data);
+    kill_thread();
+}
+
 /** Create a new thread.
  *
  * The thread is automatically placed into the queue of ready threads.
@@ -33,48 +76,24 @@ void threads_init(void) {
  * @retval ENOMEM Not enough memory to complete the operation.
  * @retval INVAL Invalid flags (unused).
  */
-static void* retvalue;
-
-static void kill_thread(void) {
-        thread_t* thread_to_kill = get_current_thread();
-        thread_t* next_thread = NULL;
-        if (thread_to_kill->is_waiting_for_me != NULL)
-            next_thread = thread_to_kill->is_waiting_for_me;
-        remove_all_dependencies(queue, thread_to_kill);
-        // printk("Before delete:\n");
-        // dump_queue_info(queue);
-        scheduler_remove_thread(thread_to_kill);
-        // printk("After delete:\n");
-        // dump_queue_info(queue);
-        kfree(thread_to_kill);
-        // printk("Killing thread %s off\n", thread_to_kill->name);
-        thread_to_kill = NULL;
-        if (next_thread == NULL)
-            scheduler_schedule_next();
-        else
-            thread_switch_to(next_thread);        
-}
-
-static void wrap(thread_t* new_thread)
-{
-    retvalue = (*new_thread->entry_func)(new_thread->data);
-    kill_thread();
-}
-
 errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name) {
     thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
+
     if (new_thread == NULL)
         return ENOMEM;
+    
     for (size_t i = 0; i < THREAD_NAME_MAX_LENGTH; i++) {
         if (name == NULL)
             break;
         new_thread->name[i] = *name++;
     }
+
     new_thread->entry_func = entry;
     new_thread->data = data;
     new_thread->status = READY;
-    new_thread->waiting_for = NULL;
-    new_thread->is_waiting_for_me = NULL;
+    new_thread->following = NULL;
+    new_thread->follower = NULL;
+
     new_thread->stack = kmalloc(THREAD_STACK_SIZE);
     new_thread->stack_top = (void*)((uintptr_t)new_thread->stack + THREAD_STACK_SIZE - sizeof(context_t));
     context_t* context = (context_t*)new_thread->stack_top;
@@ -83,8 +102,10 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     context->ra = (unative_t)wrap;
     new_thread->context = context;
     context->a0 = (unative_t)new_thread;
+
     *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
+
     return EOK;
 }
 
@@ -209,7 +230,7 @@ errno_t thread_wakeup(thread_t* thread) {
  * @retval EINVAL Invalid thread.
  */
 errno_t thread_join(thread_t* thread, void** retval) {
-    if (thread->is_waiting_for_me != NULL)
+    if (thread->follower != NULL)
         return EBUSY;
     // dump_queue_info(queue);
     if (!is_thread_in_queue(thread))
@@ -220,8 +241,8 @@ errno_t thread_join(thread_t* thread, void** retval) {
 
 
     thread_t* current_thread = get_current_thread();
-    thread->is_waiting_for_me = current_thread;
-    current_thread->waiting_for = thread;
+    thread->follower = current_thread;
+    current_thread->following = thread;
     // printk("Before suspend\n");
     thread_get_current()->status = WAITING;
     // printk("Join dump:\n");
