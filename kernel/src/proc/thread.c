@@ -34,6 +34,20 @@ void threads_init(void) {
  * @retval INVAL Invalid flags (unused).
  */
 
+static void kill_thread(void) {
+        thread_t* thread_to_kill = get_current_thread();
+        scheduler_remove_thread(thread_to_kill);
+        kfree(thread_to_kill);
+        printk("Killing current thread off\n");
+        scheduler_schedule_next();
+}
+
+static void wrap(thread_t* new_thread)
+{
+    (*new_thread->entry_func)(new_thread->data);
+    kill_thread();
+}
+
 errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name) {
     thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
     if (new_thread == NULL)
@@ -53,9 +67,9 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     context_t* context = (context_t*)new_thread->stack_top;
     context->status = 0xff01;
     context->sp = (unative_t)new_thread->stack_top + sizeof(context_t);
-    context->ra = (unative_t)entry;
-    context->a0 = (unative_t)data;
+    context->ra = (unative_t)wrap;
     new_thread->context = context;
+    context->a0 = (unative_t)new_thread;
     *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
     return EOK;
@@ -101,7 +115,7 @@ void thread_suspend(void) {
 void thread_finish(void* retval) {
     while (1) {
     }
-    printk("Finish bug\n");
+    // printk("Finish bug\n");
     // panic(); //nesmie to sem dojst
 }
 
@@ -153,8 +167,9 @@ errno_t thread_join(thread_t* thread, void** retval) {
     thread_t* current_thread = get_current_thread();
     thread->is_waiting_for_me = current_thread;
     current_thread->waiting_for = thread;
-    printk("Before suspend\n");
-    thread_suspend();
+    // printk("Before suspend\n");
+    thread_get_current()->status = WAITING;
+    thread_switch_to(thread);
 
     return EOK;
 }
@@ -169,17 +184,17 @@ errno_t thread_join(thread_t* thread, void** retval) {
 void thread_switch_to(thread_t* thread) {
     thread_t* current_thread = get_current_thread();
     set_current_thread(thread);
-    printk("DUMP IN THREAD SWITCH\n");
-    dump_queue_info(queue);
+    // printk("DUMP IN THREAD SWITCH\n");
+    // dump_queue_info(queue);
     if (current_thread == NULL)
     {
-        printk("Switching from NULL to %s\n", thread->name);
+        // printk("Switching from NULL to %s\n", thread->name);
         thread->status = RUNNING;
         cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
     }
     else
     {
-        printk("Switching from %s to %s\n", current_thread->name, thread->name);
+        // printk("Switching from %s to %s\n", current_thread->name, thread->name);
         thread->status = RUNNING;
         current_thread->status = READY;
         rotate(current_thread);

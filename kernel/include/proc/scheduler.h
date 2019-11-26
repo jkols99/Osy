@@ -28,5 +28,5 @@ inline void rotate(thread_t* target_thread) {
     scheduler_add_ready_thread(target_thread);
 };
 
-void dump_queue_info(queue_t* queue);
+// void dump_queue_info(queue_t* queue);
 #endif
