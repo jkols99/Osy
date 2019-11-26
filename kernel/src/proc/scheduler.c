@@ -43,7 +43,7 @@ void scheduler_schedule_next(void) {
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);
-    printk("OUR NEXT READY: %s \n", next_thread->name);
+    // printk("OUR NEXT READY: %s \n", next_thread->name);
     // printk("Ready to switch\n");
     thread_switch_to(next_thread);
 }

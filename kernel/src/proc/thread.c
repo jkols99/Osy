@@ -33,6 +33,7 @@ void threads_init(void) {
  * @retval ENOMEM Not enough memory to complete the operation.
  * @retval INVAL Invalid flags (unused).
  */
+static void* retvalue;
 
 static void kill_thread(void) {
         thread_t* thread_to_kill = get_current_thread();
@@ -46,7 +47,7 @@ static void kill_thread(void) {
         // printk("After delete:\n");
         // dump_queue_info(queue);
         kfree(thread_to_kill);
-        printk("Killing thread %s off\n", thread_to_kill->name);
+        // printk("Killing thread %s off\n", thread_to_kill->name);
         thread_to_kill = NULL;
         if (next_thread == NULL)
             scheduler_schedule_next();
@@ -56,7 +57,7 @@ static void kill_thread(void) {
 
 static void wrap(thread_t* new_thread)
 {
-    (*new_thread->entry_func)(new_thread->data);
+    retvalue = (*new_thread->entry_func)(new_thread->data);
     kill_thread();
 }
 
@@ -127,6 +128,7 @@ void thread_suspend(void) {
  * @param retval Data to return in thread_join.
  */
 void thread_finish(void* retval) {
+    retvalue = retval;
     while(1) {
         kill_thread();
     }
@@ -163,7 +165,8 @@ bool thread_has_finished(thread_t* thread) {
 
 /** Wakes-up existing thread.
  *
- * Note that waking-up a running (or ready) thread has no effect (i.e. the
+ * Note that waking-up a running (or ready) threadoid*)current_thread->context->v0;
+        // printk("v0: %p\n", (void*)current_thread->context->v0); has no effect (i.e. the
  * function shall not count wake-ups and suspends).
  *
  * Note that waking-up a thread does not mean that it will immediatelly start
@@ -176,7 +179,7 @@ bool thread_has_finished(thread_t* thread) {
  * @retval EEXITED Thread already finished its execution.
  */
 errno_t thread_wakeup(thread_t* thread) {
-    if (thread == NULL)
+    if (thread == NULL || !is_thread_in_queue(thread))
         return EEXITED;
 
     if (thread->status == WAITING)
@@ -206,14 +209,16 @@ errno_t thread_wakeup(thread_t* thread) {
  * @retval EINVAL Invalid thread.
  */
 errno_t thread_join(thread_t* thread, void** retval) {
+    if (thread->is_waiting_for_me != NULL)
+        return EBUSY;
     // dump_queue_info(queue);
     if (!is_thread_in_queue(thread))
-        return EINVAL;
-    else
-    {
-        printk("join thread was valid\n");
-    }
+        return EOK; // no more threads in queue, return OK, nothing bad happened here
     
+    if (thread == NULL)
+        return EINVAL;
+
+
     thread_t* current_thread = get_current_thread();
     thread->is_waiting_for_me = current_thread;
     current_thread->waiting_for = thread;
@@ -224,12 +229,9 @@ errno_t thread_join(thread_t* thread, void** retval) {
     thread_switch_to(thread);
     if (retval != NULL)
     {
-        *retval = (void*)current_thread->context->v0;
-        printk("v0: %p\n", (void*)current_thread->context->v0);
+        *retval = retvalue;
     }
-    else
-        printk("Was null\n");
-    
+
     return EOK;
 }
 
@@ -247,20 +249,16 @@ void thread_switch_to(thread_t* thread) {
     // dump_queue_info(queue);
     if (current_thread == NULL)
     {
-        printk("Switching from NULL to %s\n", thread->name);
+        // printk("Switching from NULL to %s\n", thread->name);
         if (thread == NULL)
             printk("Thread in switch was NULL\n");
-        else
-        {
-            printk("Wasnt null");
-        }
-        
+
         thread->status = RUNNING;
         cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
     }
     else
     {
-        printk("Switching from %s to %s\n", current_thread->name, thread->name);
+        // printk("Switching from %s to %s\n", current_thread->name, thread->name);
         thread->status = RUNNING;
         rotate(current_thread);
         cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
