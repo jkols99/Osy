@@ -9,6 +9,7 @@
 
 #include <ktest.h>
 #include <proc/thread.h>
+#include <lib/print.h>
 
 #define LOOPS 20
 
@@ -20,6 +21,7 @@ static volatile int counter_two = 0;
 static void* worker_one(void* ignored) {
     while (!terminate_one) {
         counter_one++;
+        printk("Worker one with counter: %d\n", counter_one);
         thread_yield();
     }
 
@@ -29,6 +31,7 @@ static void* worker_one(void* ignored) {
 static void* worker_two(void* ignored) {
     while (!terminate_two) {
         counter_two++;
+        printk("Worker two with counter: %d\n", counter_two);
         thread_yield();
     }
 
@@ -49,6 +52,7 @@ void kernel_test(void) {
     ktest_assert_errno(err, "thread_create(two)");
 
     for (int i = 0; i < LOOPS; i++) {
+        printk("INIT with loop counter: %d\n", i);
         thread_yield();
     }
 

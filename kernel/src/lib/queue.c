@@ -78,7 +78,8 @@ void dequeue(queue_t* q, thread_t* thread) {
 thread_t* get_next_ready(queue_t* where, int status) {
     qnode_t* front = where->front;
 
-    while(front != NULL && front->key->status != status ) {
+          //until the end or until status match but not if it is waiting for other thread
+    while(front != NULL && front->key->status != status && front->key->waiting_for != NULL) {
         front = front-> next;
     }
     
@@ -86,4 +87,16 @@ thread_t* get_next_ready(queue_t* where, int status) {
         return NULL;
     else
         return front->key;
+}
+
+void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill)
+{
+    qnode_t* temp = queue->front;
+
+    while (temp != NULL)
+    {
+        if (temp->key->waiting_for == thread_to_kill)
+            temp->key->waiting_for = NULL;
+        temp = temp->next;
+    }
 }

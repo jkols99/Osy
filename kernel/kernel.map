@@ -127,7 +127,7 @@ Linker script and memory map
 
                 [!provide]                        PROVIDE (_kernel_start = 0x80000000)
 
-.kernel         0x0000000080000000     0x5da4
+.kernel         0x0000000080000000     0x6054
  *(.excvec)
  .excvec        0x0000000080000000      0x438 src/head.o
                 0x0000000080000000                exception_tlb_refill
@@ -148,97 +148,103 @@ Linker script and memory map
                 0x00000000800006f8                printk
                 0x0000000080000ec8                print_string
                 0x0000000080000ef0                puts
- .text          0x0000000080000f20      0x180 src/lib/queue.o
+ .text          0x0000000080000f20      0x1d0 src/lib/queue.o
                 0x0000000080000f20                new_node
                 0x0000000080000f50                create_queue
                 0x0000000080000f74                enqueue
                 0x0000000080000fe0                dequeue
                 0x000000008000105c                get_next_ready
- .text          0x00000000800010a0      0x320 src/lib/runtime.o
-                0x0000000080001140                __udivdi3
-                0x00000000800011a4                __umoddi3
-                0x0000000080001214                __divdi3
-                0x0000000080001304                __moddi3
- .text          0x00000000800013c0      0x480 src/mm/heap.o
-                0x00000000800013c0                count_biggest_free_block
-                0x000000008000146c                heap_init
-                0x00000000800014b0                push_first
-                0x000000008000150c                push_back
-                0x0000000080001618                kmalloc
-                0x00000000800016f0                delete_chunk
-                0x0000000080001774                kfree
-                0x00000000800017a0                print_array
- .text          0x0000000080001840      0x130 src/proc/context.o
-                0x0000000080001840                cpu_switch_context
- .text          0x0000000080001970       0xa0 src/proc/scheduler.o
-                0x0000000080001970                scheduler_init
-                0x0000000080001994                scheduler_add_ready_thread
-                0x00000000800019a4                scheduler_remove_thread
-                0x00000000800019b4                scheduler_schedule_next
- .text          0x0000000080001a10      0x2a0 src/proc/thread.o
-                0x0000000080001a58                threads_init
-                0x0000000080001a60                thread_create
-                0x0000000080001b60                thread_get_current
-                0x0000000080001b6c                thread_yield
-                0x0000000080001b98                thread_suspend
-                0x0000000080001bac                thread_finish
-                0x0000000080001bb4                thread_has_finished
-                0x0000000080001bc4                thread_wakeup
-                0x0000000080001bf4                thread_switch_to
-                0x0000000080001c70                thread_join
+                0x00000000800010ac                remove_all_dependencies
+ .text          0x00000000800010f0      0x320 src/lib/runtime.o
+                0x0000000080001190                __udivdi3
+                0x00000000800011f4                __umoddi3
+                0x0000000080001264                __divdi3
+                0x0000000080001354                __moddi3
+ .text          0x0000000080001410      0x480 src/mm/heap.o
+                0x0000000080001410                count_biggest_free_block
+                0x00000000800014bc                heap_init
+                0x0000000080001500                push_first
+                0x000000008000155c                push_back
+                0x0000000080001668                kmalloc
+                0x0000000080001740                delete_chunk
+                0x00000000800017c4                kfree
+                0x00000000800017f0                print_array
+ .text          0x0000000080001890      0x130 src/proc/context.o
+                0x0000000080001890                cpu_switch_context
+ .text          0x00000000800019c0      0x150 src/proc/scheduler.o
+                0x00000000800019c0                scheduler_init
+                0x00000000800019e4                scheduler_add_ready_thread
+                0x00000000800019f4                scheduler_remove_thread
+                0x0000000080001a04                dump_queue_info
+                0x0000000080001a68                scheduler_schedule_next
+ .text          0x0000000080001b10      0x3a0 src/proc/thread.o
+                0x0000000080001b10                threads_init
+                0x0000000080001b18                thread_create
+                0x0000000080001c18                thread_get_current
+                0x0000000080001c24                thread_yield
+                0x0000000080001c58                thread_suspend
+                0x0000000080001c6c                thread_has_finished
+                0x0000000080001c7c                thread_wakeup
+                0x0000000080001cac                thread_switch_to
+                0x0000000080001e00                thread_finish
+                0x0000000080001e20                thread_join
  *(.data)
- .data          0x0000000080001cb0        0x0 src/main.o
- .data          0x0000000080001cb0        0x0 src/head.o
- .data          0x0000000080001cb0        0x0 src/debug/code.o
- .data          0x0000000080001cb0        0x0 src/debug/mm.o
- .data          0x0000000080001cb0        0x0 src/lib/print.o
- .data          0x0000000080001cb0        0x0 src/lib/queue.o
- .data          0x0000000080001cb0        0x0 src/lib/runtime.o
- .data          0x0000000080001cb0        0x0 src/mm/heap.o
- .data          0x0000000080001cb0        0x0 src/proc/context.o
- .data          0x0000000080001cb0        0x0 src/proc/scheduler.o
- .data          0x0000000080001cb0        0x0 src/proc/thread.o
+ .data          0x0000000080001eb0        0x0 src/main.o
+ .data          0x0000000080001eb0        0x0 src/head.o
+ .data          0x0000000080001eb0        0x0 src/debug/code.o
+ .data          0x0000000080001eb0        0x0 src/debug/mm.o
+ .data          0x0000000080001eb0        0x0 src/lib/print.o
+ .data          0x0000000080001eb0        0x0 src/lib/queue.o
+ .data          0x0000000080001eb0        0x0 src/lib/runtime.o
+ .data          0x0000000080001eb0        0x0 src/mm/heap.o
+ .data          0x0000000080001eb0        0x0 src/proc/context.o
+ .data          0x0000000080001eb0        0x0 src/proc/scheduler.o
+ .data          0x0000000080001eb0        0x0 src/proc/thread.o
  *(.rodata .rodata.*)
  .rodata.str1.4
-                0x0000000080001cb0      0x147 src/main.o
+                0x0000000080001eb0      0x147 src/main.o
                                         0x148 (size before relaxing)
- *fill*         0x0000000080001df7        0x9 
- .rodata        0x0000000080001e00       0x20 src/main.o
+ *fill*         0x0000000080001ff7        0x9 
+ .rodata        0x0000000080002000       0x20 src/main.o
  .rodata.str1.4
-                0x0000000080001e20       0x1b src/debug/code.o
+                0x0000000080002020       0x1b src/debug/code.o
                                          0x1c (size before relaxing)
- *fill*         0x0000000080001e3b        0x1 
+ *fill*         0x000000008000203b        0x1 
  .rodata.str1.4
-                0x0000000080001e3c       0x69 src/lib/print.o
+                0x000000008000203c       0x69 src/lib/print.o
                                          0x6c (size before relaxing)
- *fill*         0x0000000080001ea5        0x3 
+ *fill*         0x00000000800020a5        0x3 
  .rodata.str1.4
-                0x0000000080001ea8       0x3d src/mm/heap.o
+                0x00000000800020a8       0x3d src/mm/heap.o
                                          0x40 (size before relaxing)
- *fill*         0x0000000080001ee5        0x3 
+ *fill*         0x00000000800020e5        0x3 
  .rodata.str1.4
-                0x0000000080001ee8       0x1c src/proc/thread.o
+                0x00000000800020e8       0x69 src/proc/scheduler.o
+                                         0x6c (size before relaxing)
+ *fill*         0x0000000080002151        0x3 
+ .rodata.str1.4
+                0x0000000080002154       0x64 src/proc/thread.o
  *(.bss .bss.*)
- *fill*         0x0000000080001f04        0xc 
- .bss           0x0000000080001f10        0x0 src/main.o
- .bss           0x0000000080001f10        0x0 src/head.o
- .bss           0x0000000080001f10        0x0 src/debug/code.o
- .bss           0x0000000080001f10        0x0 src/debug/mm.o
- .bss           0x0000000080001f10        0x0 src/lib/print.o
- .bss           0x0000000080001f10        0x0 src/lib/queue.o
- .bss           0x0000000080001f10        0x0 src/lib/runtime.o
- .bss           0x0000000080001f10        0x0 src/mm/heap.o
- .bss           0x0000000080001f10        0x0 src/proc/context.o
- .bss           0x0000000080001f10        0x0 src/proc/scheduler.o
- .bss           0x0000000080001f10        0x0 src/proc/thread.o
+ *fill*         0x00000000800021b8        0x8 
+ .bss           0x00000000800021c0        0x0 src/main.o
+ .bss           0x00000000800021c0        0x0 src/head.o
+ .bss           0x00000000800021c0        0x0 src/debug/code.o
+ .bss           0x00000000800021c0        0x0 src/debug/mm.o
+ .bss           0x00000000800021c0        0x0 src/lib/print.o
+ .bss           0x00000000800021c0        0x0 src/lib/queue.o
+ .bss           0x00000000800021c0        0x0 src/lib/runtime.o
+ .bss           0x00000000800021c0        0x0 src/mm/heap.o
+ .bss           0x00000000800021c0        0x0 src/proc/context.o
+ .bss           0x00000000800021c0        0x0 src/proc/scheduler.o
+ .bss           0x00000000800021c0        0x0 src/proc/thread.o
  *(COMMON)
- COMMON         0x0000000080001f10     0x3e94 src/main.o
-                0x0000000080001f10                queue
-                0x0000000080001f14                current_thread
-                0x0000000080001f18                mem_left
-                0x0000000080001f1c                heap
-                0x0000000080005da0                biggest_gap_index
-                0x0000000080005da4                _kernel_end = .
+ COMMON         0x00000000800021c0     0x3e94 src/main.o
+                0x00000000800021c0                queue
+                0x00000000800021c4                current_thread
+                0x00000000800021c8                mem_left
+                0x00000000800021cc                heap
+                0x0000000080006050                biggest_gap_index
+                0x0000000080006054                _kernel_end = .
 
 .stab
  *(.stab)
@@ -271,18 +277,18 @@ Linker script and memory map
  .comment       0x0000000000000020       0x21 src/proc/scheduler.o
  .comment       0x0000000000000020       0x21 src/proc/thread.o
 
-.pdr            0x0000000000000000      0x5c0
+.pdr            0x0000000000000000      0x620
  .pdr           0x0000000000000000       0x40 src/main.o
  .pdr           0x0000000000000040       0x80 src/head.o
  .pdr           0x00000000000000c0       0x20 src/debug/code.o
  .pdr           0x00000000000000e0       0x20 src/debug/mm.o
  .pdr           0x0000000000000100       0x80 src/lib/print.o
- .pdr           0x0000000000000180       0xa0 src/lib/queue.o
- .pdr           0x0000000000000220       0xa0 src/lib/runtime.o
- .pdr           0x00000000000002c0      0x100 src/mm/heap.o
- .pdr           0x00000000000003c0       0x20 src/proc/context.o
- .pdr           0x00000000000003e0       0x80 src/proc/scheduler.o
- .pdr           0x0000000000000460      0x160 src/proc/thread.o
+ .pdr           0x0000000000000180       0xc0 src/lib/queue.o
+ .pdr           0x0000000000000240       0xa0 src/lib/runtime.o
+ .pdr           0x00000000000002e0      0x100 src/mm/heap.o
+ .pdr           0x00000000000003e0       0x20 src/proc/context.o
+ .pdr           0x0000000000000400       0xa0 src/proc/scheduler.o
+ .pdr           0x00000000000004a0      0x180 src/proc/thread.o
 
 .mdebug.abi32   0x0000000000000000        0x0
  .mdebug.abi32  0x0000000000000000        0x0 src/main.o
@@ -335,21 +341,21 @@ Linker script and memory map
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0x3e87
+.debug_info     0x0000000000000000     0x40b1
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000      0x734 src/main.o
  .debug_info    0x0000000000000734       0x26 src/head.o
  .debug_info    0x000000000000075a      0x16e src/debug/code.o
  .debug_info    0x00000000000008c8       0xfe src/debug/mm.o
  .debug_info    0x00000000000009c6     0x142a src/lib/print.o
- .debug_info    0x0000000000001df0      0x6a7 src/lib/queue.o
- .debug_info    0x0000000000002497      0x4ac src/lib/runtime.o
- .debug_info    0x0000000000002943      0x58d src/mm/heap.o
- .debug_info    0x0000000000002ed0       0x26 src/proc/context.o
- .debug_info    0x0000000000002ef6      0x52e src/proc/scheduler.o
- .debug_info    0x0000000000003424      0xa63 src/proc/thread.o
+ .debug_info    0x0000000000001df0      0x6f4 src/lib/queue.o
+ .debug_info    0x00000000000024e4      0x4ac src/lib/runtime.o
+ .debug_info    0x0000000000002990      0x58d src/mm/heap.o
+ .debug_info    0x0000000000002f1d       0x26 src/proc/context.o
+ .debug_info    0x0000000000002f43      0x611 src/proc/scheduler.o
+ .debug_info    0x0000000000003554      0xb5d src/proc/thread.o
 
-.debug_abbrev   0x0000000000000000     0x1153
+.debug_abbrev   0x0000000000000000     0x1179
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000      0x235 src/main.o
  .debug_abbrev  0x0000000000000235       0x14 src/head.o
@@ -361,35 +367,35 @@ Linker script and memory map
  .debug_abbrev  0x0000000000000a60      0x26d src/mm/heap.o
  .debug_abbrev  0x0000000000000ccd       0x14 src/proc/context.o
  .debug_abbrev  0x0000000000000ce1      0x15c src/proc/scheduler.o
- .debug_abbrev  0x0000000000000e3d      0x316 src/proc/thread.o
+ .debug_abbrev  0x0000000000000e3d      0x33c src/proc/thread.o
 
-.debug_line     0x0000000000000000     0x1f47
+.debug_line     0x0000000000000000     0x20a1
  *(.debug_line)
  .debug_line    0x0000000000000000      0x1b1 src/main.o
  .debug_line    0x00000000000001b1       0x41 src/head.o
  .debug_line    0x00000000000001f2       0xd5 src/debug/code.o
  .debug_line    0x00000000000002c7       0xad src/debug/mm.o
  .debug_line    0x0000000000000374      0xcdc src/lib/print.o
- .debug_line    0x0000000000001050      0x229 src/lib/queue.o
- .debug_line    0x0000000000001279      0x2af src/lib/runtime.o
- .debug_line    0x0000000000001528      0x484 src/mm/heap.o
- .debug_line    0x00000000000019ac       0x5c src/proc/context.o
- .debug_line    0x0000000000001a08      0x15f src/proc/scheduler.o
- .debug_line    0x0000000000001b67      0x3e0 src/proc/thread.o
+ .debug_line    0x0000000000001050      0x257 src/lib/queue.o
+ .debug_line    0x00000000000012a7      0x2af src/lib/runtime.o
+ .debug_line    0x0000000000001556      0x484 src/mm/heap.o
+ .debug_line    0x00000000000019da       0x5c src/proc/context.o
+ .debug_line    0x0000000000001a36      0x1bf src/proc/scheduler.o
+ .debug_line    0x0000000000001bf5      0x4ac src/proc/thread.o
 
-.debug_frame    0x0000000000000000      0x4e0
+.debug_frame    0x0000000000000000      0x564
  *(.debug_frame)
  .debug_frame   0x0000000000000000       0x4c src/main.o
  .debug_frame   0x000000000000004c       0x38 src/debug/code.o
  .debug_frame   0x0000000000000084       0x20 src/debug/mm.o
  .debug_frame   0x00000000000000a4       0x88 src/lib/print.o
- .debug_frame   0x000000000000012c       0x98 src/lib/queue.o
- .debug_frame   0x00000000000001c4       0xa4 src/lib/runtime.o
- .debug_frame   0x0000000000000268       0xe0 src/mm/heap.o
- .debug_frame   0x0000000000000348       0x74 src/proc/scheduler.o
- .debug_frame   0x00000000000003bc      0x124 src/proc/thread.o
+ .debug_frame   0x000000000000012c       0xa8 src/lib/queue.o
+ .debug_frame   0x00000000000001d4       0xa4 src/lib/runtime.o
+ .debug_frame   0x0000000000000278       0xe0 src/mm/heap.o
+ .debug_frame   0x0000000000000358       0x9c src/proc/scheduler.o
+ .debug_frame   0x00000000000003f4      0x170 src/proc/thread.o
 
-.debug_str      0x0000000000000000     0x3286
+.debug_str      0x0000000000000000     0x32ae
  *(.debug_str)
  .debug_str     0x0000000000000000     0x2a66 src/main.o
                                        0x2b46 (size before relaxing)
@@ -401,30 +407,30 @@ Linker script and memory map
                                        0x226b (size before relaxing)
  .debug_str     0x0000000000002b21      0x3ea src/lib/print.o
                                        0x2a3b (size before relaxing)
- .debug_str     0x0000000000002f0b       0x69 src/lib/queue.o
-                                       0x24bc (size before relaxing)
- .debug_str     0x0000000000002f74       0x87 src/lib/runtime.o
+ .debug_str     0x0000000000002f0b       0x90 src/lib/queue.o
+                                       0x24e3 (size before relaxing)
+ .debug_str     0x0000000000002f9b       0x87 src/lib/runtime.o
                                        0x2160 (size before relaxing)
- .debug_str     0x0000000000002ffb       0xff src/mm/heap.o
+ .debug_str     0x0000000000003022       0xff src/mm/heap.o
                                        0x241b (size before relaxing)
- .debug_str     0x00000000000030fa       0x13 src/proc/context.o
+ .debug_str     0x0000000000003121       0x13 src/proc/context.o
                                          0x5a (size before relaxing)
- .debug_str     0x000000000000310d       0x65 src/proc/scheduler.o
-                                       0x2736 (size before relaxing)
- .debug_str     0x0000000000003172      0x114 src/proc/thread.o
-                                       0x264a (size before relaxing)
+ .debug_str     0x0000000000003134       0x75 src/proc/scheduler.o
+                                       0x2752 (size before relaxing)
+ .debug_str     0x00000000000031a9      0x105 src/proc/thread.o
+                                       0x266e (size before relaxing)
 
-.debug_loc      0x0000000000000000     0x2215
+.debug_loc      0x0000000000000000     0x23b4
  *(.debug_loc)
  .debug_loc     0x0000000000000000       0x83 src/main.o
  .debug_loc     0x0000000000000083       0xea src/debug/code.o
  .debug_loc     0x000000000000016d       0x58 src/debug/mm.o
  .debug_loc     0x00000000000001c5      0xe9d src/lib/print.o
- .debug_loc     0x0000000000001062      0x356 src/lib/queue.o
- .debug_loc     0x00000000000013b8      0x612 src/lib/runtime.o
- .debug_loc     0x00000000000019ca      0x3fa src/mm/heap.o
- .debug_loc     0x0000000000001dc4       0x93 src/proc/scheduler.o
- .debug_loc     0x0000000000001e57      0x3be src/proc/thread.o
+ .debug_loc     0x0000000000001062      0x390 src/lib/queue.o
+ .debug_loc     0x00000000000013f2      0x612 src/lib/runtime.o
+ .debug_loc     0x0000000000001a04      0x3fa src/mm/heap.o
+ .debug_loc     0x0000000000001dfe      0x10e src/proc/scheduler.o
+ .debug_loc     0x0000000000001f0c      0x4a8 src/proc/thread.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -444,13 +450,13 @@ Linker script and memory map
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x680
+.debug_ranges   0x0000000000000000      0x698
  *(.debug_ranges)
  .debug_ranges  0x0000000000000000      0x3b8 src/lib/print.o
  .debug_ranges  0x00000000000003b8       0x20 src/lib/queue.o
  .debug_ranges  0x00000000000003d8      0x188 src/lib/runtime.o
  .debug_ranges  0x0000000000000560       0x88 src/mm/heap.o
- .debug_ranges  0x00000000000005e8       0x98 src/proc/thread.o
+ .debug_ranges  0x00000000000005e8       0xb0 src/proc/thread.o
 
 .gnu.attributes
                 0x0000000000000000       0x10

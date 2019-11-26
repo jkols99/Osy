@@ -24,4 +24,5 @@ qnode_t* new_node(thread_t* k);
 thread_t* get_next_ready(queue_t* where, int status);
 void enqueue(queue_t* q, thread_t* k);
 void dequeue(queue_t* q, thread_t* thread);
+void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill);
 #endif

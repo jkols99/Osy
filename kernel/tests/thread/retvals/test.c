@@ -40,6 +40,7 @@ void kernel_test(void) {
     err = thread_create(&three, worker_three, NULL, 0, "test_three");
     ktest_assert_errno(err, "thread_create(three)");
 
+    printk("Ret one: %p\n", &ret_one);
     void* retval;
     err = thread_join(one, &retval);
     ktest_assert_errno(err, "thread_join(one)");

@@ -38,22 +38,24 @@ void scheduler_remove_thread(thread_t* thread) {
 
 /** Switch to next thread in the queue. */
 void scheduler_schedule_next(void) {
+    printk("Schedule next queue: \n");
+    dump_queue_info(queue);
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);
-    // printk("OUR NEXT READY: %s \n", next_thread->name);
+    printk("OUR NEXT READY: %s \n", next_thread->name);
     // printk("Ready to switch\n");
     thread_switch_to(next_thread);
 }
 
-// void dump_queue_info(queue_t* queue)
-// {
-//     qnode_t* temp = queue->front;
-//     printk("Dumping queue:\n");
-//     while (temp != NULL)
-//     {
-//         printk("Thread: %s\n", temp->key->name);
-//         temp = temp->next;
-//     }
-//     printk("Dumping ends\n");
-// }
+void dump_queue_info(queue_t* queue)
+{
+    qnode_t* temp = queue->front;
+    printk("Dumping queue:\n");
+    while (temp != NULL)
+    {
+        printk("Thread: %s with status %d\n", temp->key->name, temp->key->status);
+        temp = temp->next;
+    }
+    printk("Dumping ends\n");
+}
