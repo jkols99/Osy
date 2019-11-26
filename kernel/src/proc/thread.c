@@ -40,9 +40,14 @@ static void kill_thread(void) {
         if (thread_to_kill->is_waiting_for_me != NULL)
             next_thread = thread_to_kill->is_waiting_for_me;
         remove_all_dependencies(queue, thread_to_kill);
+        // printk("Before delete:\n");
+        // dump_queue_info(queue);
         scheduler_remove_thread(thread_to_kill);
+        // printk("After delete:\n");
+        // dump_queue_info(queue);
         kfree(thread_to_kill);
         printk("Killing thread %s off\n", thread_to_kill->name);
+        thread_to_kill = NULL;
         if (next_thread == NULL)
             scheduler_schedule_next();
         else
@@ -92,8 +97,8 @@ thread_t* thread_get_current(void) {
 
 /** Yield the processor. */
 void thread_yield(void) {
-    thread_get_current()->status = WAITING;
     thread_t* current_thread = get_current_thread();
+    current_thread->status = READY;
     // printk("Current running thread: %s\n", current_thread->name);
     rotate(current_thread);
     // printk("AFTER REMOVE DUMP\n");
@@ -105,8 +110,10 @@ void thread_yield(void) {
 
 /** Current thread stops execution and is not scheduled until woken up. */
 void thread_suspend(void) {
-    thread_get_current()->status = WAITING;
-    thread_yield();
+    thread_t* current_thread = get_current_thread();
+    current_thread->status = SUSPENDED;
+    rotate(current_thread);
+    scheduler_schedule_next();
 }
 
 /** Terminate currently running thread.
@@ -125,13 +132,33 @@ void thread_finish(void* retval) {
     }
 }
 
+static bool is_thread_in_queue(thread_t* target_thread)
+{
+    qnode_t* temp = queue->front;
+
+    while (1)
+    {
+        if (temp == NULL)
+            return false;
+        if (temp->key == target_thread)
+            return true;
+        temp = temp->next;
+    }
+}
+
+
 /** Tells if thread already called thread_finish() or returned from the entry
  * function.
  *
  * @param thread Thread in question.
  */
 bool thread_has_finished(thread_t* thread) {
-    return thread->status == FINISHED;
+    if (thread == NULL)
+        return true;
+    if (is_thread_in_queue(thread))
+        return false;
+    
+    return true;    
 }
 
 /** Wakes-up existing thread.
@@ -149,12 +176,21 @@ bool thread_has_finished(thread_t* thread) {
  * @retval EEXITED Thread already finished its execution.
  */
 errno_t thread_wakeup(thread_t* thread) {
-    if (thread->status == READY || thread->status == RUNNING)
-        return EINVAL;
-    if (thread->status == FINISHED)
+    if (thread == NULL)
         return EEXITED;
 
-    return ENOIMPL;
+    if (thread->status == WAITING)
+        return EINVAL;
+
+    if (thread->status == READY || thread->status == RUNNING )
+        return EOK;
+
+    thread->status = READY;
+    // according to suspend test, we should call yield here, because wake-upper will die before
+    // it can be joined with INIT thread and still return EOK from that join
+    thread_yield();
+
+    return EOK;
 }
 
 /** Joins another thread (waits for it to terminate.
@@ -170,6 +206,14 @@ errno_t thread_wakeup(thread_t* thread) {
  * @retval EINVAL Invalid thread.
  */
 errno_t thread_join(thread_t* thread, void** retval) {
+    // dump_queue_info(queue);
+    if (!is_thread_in_queue(thread))
+        return EINVAL;
+    else
+    {
+        printk("join thread was valid\n");
+    }
+    
     thread_t* current_thread = get_current_thread();
     thread->is_waiting_for_me = current_thread;
     current_thread->waiting_for = thread;
@@ -204,6 +248,13 @@ void thread_switch_to(thread_t* thread) {
     if (current_thread == NULL)
     {
         printk("Switching from NULL to %s\n", thread->name);
+        if (thread == NULL)
+            printk("Thread in switch was NULL\n");
+        else
+        {
+            printk("Wasnt null");
+        }
+        
         thread->status = RUNNING;
         cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
     }

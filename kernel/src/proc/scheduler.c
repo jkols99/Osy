@@ -32,14 +32,14 @@ void scheduler_add_ready_thread(thread_t* thread) {
  *
  * @param thread Thread to remove from the queue.
  */
-void scheduler_remove_thread(thread_t* thread) {
-    dequeue(queue, thread);
+bool scheduler_remove_thread(thread_t* thread) {
+    return dequeue(queue, thread);
 }
 
 /** Switch to next thread in the queue. */
 void scheduler_schedule_next(void) {
-    printk("Schedule next queue: \n");
-    dump_queue_info(queue);
+    // printk("Schedule next queue: \n");
+    // dump_queue_info(queue);
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);

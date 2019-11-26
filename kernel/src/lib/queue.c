@@ -38,10 +38,10 @@ void enqueue(queue_t* q, thread_t* k) {
 }
 
 // Function to remove a thread from given queue q
-void dequeue(queue_t* q, thread_t* thread) {
+bool dequeue(queue_t* q, thread_t* thread) {
     // If queue is empty, return NULL.
     if (q->front == NULL) // 0 in queue
-        return;
+        return false;
 
     qnode_t* temp = q->front;
     qnode_t* before_the_temp = NULL;
@@ -56,7 +56,7 @@ void dequeue(queue_t* q, thread_t* thread) {
 
     //if thread is not found, return
     if (temp == NULL) 
-        return;
+        return false;
 
     //else remove given thread and free its memory
     if (before_the_temp != NULL) // 2+ in queue
@@ -73,20 +73,32 @@ void dequeue(queue_t* q, thread_t* thread) {
     }
 
     kfree(temp);
+    return true;
 }
 
 thread_t* get_next_ready(queue_t* where, int status) {
     qnode_t* front = where->front;
 
           //until the end or until status match but not if it is waiting for other thread
-    while(front != NULL && front->key->status != status && front->key->waiting_for != NULL) {
-        front = front-> next;
+    // while(front != NULL && front->key->status != status && front->key->waiting_for != NULL) {
+    //     front = front-> next;
+    // }
+
+    while(1) {
+        if (front == NULL)
+            return NULL;
+        if (front->key->status == status && front->key->waiting_for == NULL)
+            return front->key;
+        front = front->next;
     }
-    
-    if (front == NULL)
-        return NULL;
-    else
-        return front->key;
+
+    // if (front == NULL)
+    //     return NULL;
+    // else
+    // {
+    //     printk("Get next ready found %s with status %d and target status was %d\n", front->key->name, front->key->status, status);
+    //     return front->key;
+    // }
 }
 
 void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill)

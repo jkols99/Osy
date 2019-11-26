@@ -20,7 +20,9 @@ static volatile bool terminate_idle = false;
 
 static void* worker_suspend(void* ignored) {
     marker = true;
+    printk("In worker suspend\n");
     thread_suspend();
+    printk("In worker after suspend\n");
     ktest_assert(!marker, "marker should be false (set from different thread)");
     return NULL;
 }
@@ -29,6 +31,7 @@ static void* worker_wake_up(void* ignored) {
     while (!marker) {
         thread_yield();
     }
+    printk("In worker wakeup\n");
 
     /*
 	 * Now, worker_suspend should be already suspended.
@@ -37,6 +40,7 @@ static void* worker_wake_up(void* ignored) {
     for (int i = 0; i < SAFETY_LOOPS; i++) {
         thread_yield();
     }
+    printk("In worker wakeup after yields\n");
 
     marker = false;
     errno_t err = thread_wakeup(suspended_thread);
@@ -46,9 +50,13 @@ static void* worker_wake_up(void* ignored) {
 }
 
 static void* worker_idle(void* ignored) {
+    printk("In worker idle\n");
+
     while (!terminate_idle) {
         thread_yield();
     }
+    printk("In worker idle after yields\n");
+
     return NULL;
 }
 
@@ -70,7 +78,7 @@ void kernel_test(void) {
 
     err = thread_join(suspended_thread, NULL);
     ktest_assert_errno(err, "thread_join(suspend)");
-
+    printk("Joining with wake-upper\n");
     err = thread_join(wake_upper, NULL);
     ktest_assert_errno(err, "thread_join(wake_up)");
 

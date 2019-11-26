@@ -25,7 +25,7 @@ typedef void* (*thread_entry_func_t)(void*);
 #define READY 0
 #define RUNNING 1
 #define WAITING 2
-#define JOINING 3
+#define SUSPENDED 3
 #define FINISHED 4
 typedef int status_t;
 
