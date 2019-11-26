@@ -4,6 +4,7 @@
 #include "lib/queue.h"
 #include <debug.h>
 #include <proc/scheduler.h>
+#include <lib/print.h>
 
 /** Initialize support for scheduling.
  *
@@ -37,8 +38,22 @@ void scheduler_remove_thread(thread_t* thread) {
 
 /** Switch to next thread in the queue. */
 void scheduler_schedule_next(void) {
-    thread_t* next_thread = queue->front->key;
-    running_thread = next_thread;
-    (*next_thread->entry_func)(next_thread->data); //chceme context switch
-    running_thread->status = FINISHED;
+    thread_t* next_thread = get_next_ready(queue, 0);
+    if (next_thread == NULL)
+        next_thread = get_next_ready(queue, 2);
+    printk("OUR NEXT READY: %s \n", next_thread->name);
+    printk("Ready to switch\n");
+    thread_switch_to(next_thread);
+}
+
+void dump_queue_info(queue_t* queue)
+{
+    qnode_t* temp = queue->front;
+    printk("Dumping queue:\n");
+    while (temp != NULL)
+    {
+        printk("Thread: %s\n", temp->key->name);
+        temp = temp->next;
+    }
+    printk("Dumping ends\n");
 }

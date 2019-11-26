@@ -17,11 +17,11 @@ typedef struct queue queue_t;
 
 struct queue {
     qnode_t *front, *rear;
-    size_t size;
 };
 
 queue_t* create_queue(void);
 qnode_t* new_node(thread_t* k);
+thread_t* get_next_ready(queue_t* where, int status);
 void enqueue(queue_t* q, thread_t* k);
 void dequeue(queue_t* q, thread_t* thread);
 #endif

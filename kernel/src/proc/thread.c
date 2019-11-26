@@ -5,6 +5,8 @@
 #include <mm/heap.h>
 #include <proc/context.h>
 #include <proc/scheduler.h>
+#include <lib/print.h>
+#include <debug/code.h>
 
 /** Initialize support for threading.
  *
@@ -43,17 +45,17 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     new_thread->entry_func = entry;
     new_thread->data = data;
     new_thread->status = READY;
-    new_thread->stack = kmalloc(THREAD_STACK_SIZE); //sem pamatat context
     new_thread->waiting_for = NULL;
     new_thread->is_waiting_for_me = NULL;
+    new_thread->stack = kmalloc(THREAD_STACK_SIZE);
     new_thread->stack_top = (void*)((uintptr_t)new_thread->stack + THREAD_STACK_SIZE - sizeof(context_t));
     context_t* context = (context_t*)new_thread->stack_top;
-    context->a0 = (unative_t)data; // mozno cely thread
     context->status = 0xff01;
+    context->sp = (unative_t)new_thread->stack_top + sizeof(context_t);
     context->ra = (unative_t)entry;
-    //donastavit ra a sp
+    context->a0 = (unative_t)data;
     new_thread->context = context;
-    thread_out = &new_thread;
+    *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
     return EOK;
 }
@@ -68,13 +70,20 @@ thread_t* thread_get_current(void) {
 
 /** Yield the processor. */
 void thread_yield(void) {
-    //thread_t* current = thread_get_current(); let next thread work
-}
+    thread_t* current_thread = get_current_thread();
+    printk("Current running thread: %s\n", current_thread->name);
+    scheduler_remove_thread(current_thread);
+    printk("AFTER REMOVE DUMP\n");
+    dump_queue_info(queue);
+    scheduler_add_ready_thread(current_thread);
+    printk("After yield dump: \n");
+    dump_queue_info(queue);
+    scheduler_schedule_next();
+} // init -> waiting, worker -> ready
 
 /** Current thread stops execution and is not scheduled until woken up. */
 void thread_suspend(void) {
-    thread_t* current = thread_get_current();
-    current->status = WAITING;
+    thread_get_current()->status = WAITING;
     thread_yield();
 }
 
@@ -122,6 +131,7 @@ errno_t thread_wakeup(thread_t* thread) {
         return EINVAL;
     if (thread->status == FINISHED)
         return EEXITED;
+
     return ENOIMPL;
 }
 
@@ -138,9 +148,13 @@ errno_t thread_wakeup(thread_t* thread) {
  * @retval EINVAL Invalid thread.
  */
 errno_t thread_join(thread_t* thread, void** retval) {
-    if (thread->is_waiting_for_me != NULL)
-        return EBUSY;
-    return ENOIMPL;
+    thread_t* current_thread = get_current_thread();
+    thread->is_waiting_for_me = current_thread;
+    current_thread->waiting_for = thread;
+    printk("Before suspend\n");
+    thread_suspend();
+
+    return EOK;
 }
 
 /** Switch CPU context tothread a different thread.
@@ -152,5 +166,17 @@ errno_t thread_join(thread_t* thread, void** retval) {
  */
 void thread_switch_to(thread_t* thread) {
     thread_t* current_thread = get_current_thread();
-    cpu_switch_context(current_thread->stack_top, thread->stack_top, 1);
+    set_current_thread(thread);
+    printk("DUMP IN THREAD SWITCH\n");
+    dump_queue_info(queue);
+    if (current_thread == NULL)
+    {
+        printk("Switching from NULL to %s\n", thread->name);
+        cpu_switch_context((void**)debug_get_stack_pointer(), (void**)&thread->stack_top, 1); //mozno stack pointer, moze byt aj null
+    }
+    else
+    {
+        printk("Switching from %s to %s\n", current_thread->name, thread->name);
+        cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
+    }
 }

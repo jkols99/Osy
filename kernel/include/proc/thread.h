@@ -34,9 +34,9 @@ typedef struct thread thread_t;
 struct thread {
     char name[THREAD_NAME_MAX_LENGTH + 1];
     thread_entry_func_t entry_func;
-    void* data;
     status_t status;
     context_t* context; /* maybe */
+    void* data;
     void* stack;
     void* stack_top;
     thread_t* waiting_for;

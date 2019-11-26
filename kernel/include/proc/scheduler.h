@@ -8,13 +8,17 @@
 #include <proc/thread.h>
 
 queue_t* queue;
-thread_t* running_thread;
+thread_t* current_thread;
 
-inline thread_t* get_current_thread(void) { return running_thread; };
+// getter
+inline thread_t* get_current_thread(void) { return current_thread; };
+// setter
+inline void set_current_thread(thread_t* new_current_thread) { current_thread = new_current_thread; };
 
 void scheduler_init(void);
 void scheduler_add_ready_thread(thread_t* id);
 void scheduler_remove_thread(thread_t* id);
 void scheduler_schedule_next(void);
 
+void dump_queue_info(queue_t* queue);
 #endif

@@ -8,11 +8,15 @@
 
 #include <ktest.h>
 #include <proc/thread.h>
+#include <lib/print.h>
+#include <proc/scheduler.h>
+#include <proc/thread.h>
 
 #define LOOPS 5
 
 static void* empty_worker(void* ignored) {
     for (int i = 0; i < LOOPS; i++) {
+        printk("Empty worker loop: %d\n", i);
         thread_yield();
     }
     return NULL;

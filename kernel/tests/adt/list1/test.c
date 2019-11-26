@@ -22,7 +22,7 @@ static void paw_init(paw_t* paw, const char* name, const char* color) {
 
 void kernel_test(void) {
     ktest_start("adt/list1");
-
+    printk("Inside adt/list1\n");
     paw_t marshall, chase, skye;
     paw_init(&marshall, "Marshall", "red");
     paw_init(&chase, "Chase", "blue");

@@ -18,14 +18,11 @@ qnode_t* new_node(thread_t* k) {
 queue_t* create_queue(void) {
     queue_t* q = (queue_t*)kmalloc(sizeof(queue_t));
     q->front = q->rear = NULL;
-    q->size = 0;
     return q;
 }
 
 // The function to add a key k to q
 void enqueue(queue_t* q, thread_t* k) {
-    if (q->size == THREAD_STACK_SIZE)
-        return;
     // Create a new LL node
     qnode_t* temp = new_node(k);
 
@@ -38,7 +35,6 @@ void enqueue(queue_t* q, thread_t* k) {
     // Add the new node at the end of queue and change rear
     q->rear->next = temp;
     q->rear = temp;
-    q->size++;
 }
 
 // Function to remove a thread from given queue q
@@ -59,11 +55,8 @@ void dequeue(queue_t* q, thread_t* thread) {
     }
 
     //if thread is not found, print debug message and return
-    if (temp == NULL) {
-        printk("Dequeue: Thread not found\n%pT", thread);
-        printk("Queue: %pL", q);
+    if (temp == NULL) 
         return;
-    }
 
     //else remove given thread and free its memory
     if (before_the_temp != NULL)
@@ -76,5 +69,17 @@ void dequeue(queue_t* q, thread_t* thread) {
     }
 
     kfree(temp);
-    q->size--;
+}
+
+thread_t* get_next_ready(queue_t* where, int status) {
+    qnode_t* front = where->front;
+
+    while(front != NULL && front->key->status != status ) {
+        front = front-> next;
+    }
+    
+    if (front == NULL)
+        return NULL;
+    else
+        return front->key;
 }
