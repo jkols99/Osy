@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University
 
+#include <errno.h>
+#include <mm/heap.h>
 #include <proc/context.h>
 #include <proc/scheduler.h>
-#include <proc/thread.h>
 
 /** Initialize support for threading.
  *
  * Called once at system boot.
  */
 void threads_init(void) {
+    //unneccessary...
 }
 
 /** Create a new thread.
@@ -30,7 +32,29 @@ void threads_init(void) {
  * @retval INVAL Invalid flags (unused).
  */
 errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name) {
-    // thread_out = { name, entry };
+    thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
+    if (new_thread == NULL)
+        return ENOMEM;
+    for (size_t i = 0; i < THREAD_NAME_MAX_LENGTH; i++) {
+        if (name == NULL)
+            break;
+        new_thread->name[i] = *name++;
+    }
+    new_thread->entry_func = entry;
+    new_thread->data = data;
+    new_thread->status = READY;
+    new_thread->stack = kmalloc(THREAD_STACK_SIZE); //sem pamatat context
+    new_thread->waiting_for = NULL;
+    new_thread->is_waiting_for_me = NULL;
+    new_thread->stack_top = (void*)((uintptr_t)new_thread->stack + THREAD_STACK_SIZE - sizeof(context_t));
+    context_t* context = (context_t*)new_thread->stack_top;
+    context->a0 = (unative_t)data; // mozno cely thread
+    context->status = 0xff01;
+    context->ra = (unative_t)entry;
+    //donastavit ra a sp
+    new_thread->context = context;
+    thread_out = &new_thread;
+    scheduler_add_ready_thread(*thread_out);
     return EOK;
 }
 
@@ -39,15 +63,19 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
  * @retval NULL When no thread was started yet.
  */
 thread_t* thread_get_current(void) {
-    return NULL;
+    return get_current_thread();
 }
 
 /** Yield the processor. */
 void thread_yield(void) {
+    //thread_t* current = thread_get_current(); let next thread work
 }
 
 /** Current thread stops execution and is not scheduled until woken up. */
 void thread_suspend(void) {
+    thread_t* current = thread_get_current();
+    current->status = WAITING;
+    thread_yield();
 }
 
 /** Terminate currently running thread.
@@ -63,6 +91,7 @@ void thread_suspend(void) {
 void thread_finish(void* retval) {
     while (1) {
     }
+    // panic(); //nesmie to sem dojst
 }
 
 /** Tells if thread already called thread_finish() or returned from the entry
@@ -71,7 +100,7 @@ void thread_finish(void* retval) {
  * @param thread Thread in question.
  */
 bool thread_has_finished(thread_t* thread) {
-    return false;
+    return thread->status == FINISHED;
 }
 
 /** Wakes-up existing thread.
@@ -89,6 +118,10 @@ bool thread_has_finished(thread_t* thread) {
  * @retval EEXITED Thread already finished its execution.
  */
 errno_t thread_wakeup(thread_t* thread) {
+    if (thread->status == READY || thread->status == RUNNING)
+        return EINVAL;
+    if (thread->status == FINISHED)
+        return EEXITED;
     return ENOIMPL;
 }
 
@@ -105,10 +138,12 @@ errno_t thread_wakeup(thread_t* thread) {
  * @retval EINVAL Invalid thread.
  */
 errno_t thread_join(thread_t* thread, void** retval) {
+    if (thread->is_waiting_for_me != NULL)
+        return EBUSY;
     return ENOIMPL;
 }
 
-/** Switch CPU context to a different thread.
+/** Switch CPU context tothread a different thread.
  *
  * Note that this function must work even if there is no current thread
  * (i.e. for the very first context switch in the system).
@@ -116,4 +151,6 @@ errno_t thread_join(thread_t* thread, void** retval) {
  * @param thread Thread to switch to.
  */
 void thread_switch_to(thread_t* thread) {
+    thread_t* current_thread = get_current_thread();
+    cpu_switch_context(current_thread->stack_top, thread->stack_top, 1);
 }

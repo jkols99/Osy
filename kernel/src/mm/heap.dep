@@ -1,0 +1,2 @@
+src/mm/heap.o: src/mm/heap.c include/debug/code.h include/types.h \
+ include/debug/mm.h include/lib/print.h include/main.h include/mm/heap.h

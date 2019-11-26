@@ -1,0 +1,2 @@
+src/debug/mm.o: src/debug/mm.c include/debug/mm.h include/types.h \
+ include/main.h

@@ -7,27 +7,27 @@
 #include "proc/thread.h"
 
 // A utility function to create a new linked list node.
-struct qnode_t* new_node(struct thread_t* k) {
-    struct qnode_t* temp = (struct qnode_t*)kmalloc(sizeof(struct qnode_t));
+qnode_t* new_node(thread_t* k) {
+    qnode_t* temp = (qnode_t*)kmalloc(sizeof(qnode_t));
     temp->key = k;
     temp->next = NULL;
     return temp;
 }
 
-// A utility function to create an empty queue
-struct queue_t* create_queue() {
-    struct queue_t* q = (struct queue_t*)kmalloc(sizeof(struct queue_t));
+// A utility function to create an empty queue, chceme link_t, moze dojst pamat
+queue_t* create_queue(void) {
+    queue_t* q = (queue_t*)kmalloc(sizeof(queue_t));
     q->front = q->rear = NULL;
     q->size = 0;
     return q;
 }
 
 // The function to add a key k to q
-void enqueue(struct queue_t* q, struct thread_t* k) {
+void enqueue(queue_t* q, thread_t* k) {
     if (q->size == THREAD_STACK_SIZE)
         return;
     // Create a new LL node
-    struct qnode_t* temp = new_node(k);
+    qnode_t* temp = new_node(k);
 
     // If queue is empty, then new node is front and rear both
     if (q->rear == NULL) {
@@ -42,13 +42,13 @@ void enqueue(struct queue_t* q, struct thread_t* k) {
 }
 
 // Function to remove a thread from given queue q
-void dequeue(struct queue_t* q, struct thread_t* thread) {
+void dequeue(queue_t* q, thread_t* thread) {
     // If queue is empty, return NULL.
     if (q->front == NULL)
-        return NULL;
+        return;
 
-    struct qnode_t* temp = q->front;
-    struct qnode_t* before_the_temp;
+    qnode_t* temp = q->front;
+    qnode_t* before_the_temp = NULL;
 
     //find given thread
     while (temp != NULL) {
@@ -66,7 +66,15 @@ void dequeue(struct queue_t* q, struct thread_t* thread) {
     }
 
     //else remove given thread and free its memory
-    before_the_temp->next = temp->next;
+    if (before_the_temp != NULL)
+        before_the_temp->next = temp->next;
+    else {
+        if (temp->next == NULL)
+            q->front = NULL;
+        else
+            q->front = temp->next;
+    }
+
     kfree(temp);
     q->size--;
 }

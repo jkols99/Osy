@@ -84,15 +84,16 @@ void printk(const char* format, ...) {
                         print_string("[empty]");
                     }
                 } else if (*it == 'T') {
-                    const thread_t thread = va_arg(argp, const thread_t);
+                    const thread_t* thread = va_arg(argp, const thread_t*);
                     puts("Thread info:");
-                    print_string("Name: ");
-                    puts(thread.name);
-                    print_string("Address: ");
-                    printer_putchar('0');
-                    printer_putchar('x');
-                    print_int((unsigned int)thread.entry_func, targets, 16, false);
-                    puts("");
+                    puts("Name: ");
+                    puts(thread->name);
+                    if (thread->entry_func != NULL) {
+                        puts("Address: ");
+                        printer_putchar('0');
+                        printer_putchar('x');
+                        print_int((unsigned int)thread->entry_func, targets, 16, false);
+                    }
                 } else {
                     const unsigned int pointer_to_print = va_arg(argp, const unsigned int);
                     printer_putchar('0');

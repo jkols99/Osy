@@ -1,0 +1,1 @@
+src/lib/runtime.o: src/lib/runtime.c include/lib/runtime.h

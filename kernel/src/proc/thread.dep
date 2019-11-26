@@ -1,0 +1,3 @@
+src/proc/thread.o: src/proc/thread.c include/errno.h include/types.h \
+ include/mm/heap.h include/proc/context.h include/proc/scheduler.h \
+ include/lib/queue.h include/proc/thread.h

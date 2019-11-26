@@ -1,0 +1,520 @@
+
+Allocating common symbols
+Common symbol       size              file
+
+queue               0x4               src/main.o
+mem_left            0x4               src/main.o
+heap                0x3e84            src/main.o
+biggest_gap_index   0x4               src/main.o
+running_thread      0x4               src/main.o
+
+Discarded input sections
+
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .group         0x0000000000000000        0xc src/main.o
+ .reginfo       0x0000000000000000       0x18 src/main.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/main.o
+ .reginfo       0x0000000000000000       0x18 src/head.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/head.o
+ .group         0x0000000000000000        0xc src/debug/code.o
+ .group         0x0000000000000000        0xc src/debug/code.o
+ .reginfo       0x0000000000000000       0x18 src/debug/code.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/debug/code.o
+ .debug_macro   0x0000000000000000      0x760 src/debug/code.o
+ .debug_macro   0x0000000000000000       0x28 src/debug/code.o
+ .group         0x0000000000000000        0xc src/debug/mm.o
+ .group         0x0000000000000000        0xc src/debug/mm.o
+ .reginfo       0x0000000000000000       0x18 src/debug/mm.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/debug/mm.o
+ .debug_macro   0x0000000000000000      0x760 src/debug/mm.o
+ .debug_macro   0x0000000000000000       0x28 src/debug/mm.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/print.o
+ .reginfo       0x0000000000000000       0x18 src/lib/print.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/lib/print.o
+ .debug_macro   0x0000000000000000      0x760 src/lib/print.o
+ .debug_macro   0x0000000000000000       0x28 src/lib/print.o
+ .debug_macro   0x0000000000000000       0x28 src/lib/print.o
+ .debug_macro   0x0000000000000000       0x2e src/lib/print.o
+ .debug_macro   0x0000000000000000       0x16 src/lib/print.o
+ .debug_macro   0x0000000000000000       0x2e src/lib/print.o
+ .group         0x0000000000000000        0xc src/lib/queue.o
+ .group         0x0000000000000000        0xc src/lib/queue.o
+ .group         0x0000000000000000        0xc src/lib/queue.o
+ .group         0x0000000000000000        0xc src/lib/queue.o
+ .group         0x0000000000000000        0xc src/lib/queue.o
+ .group         0x0000000000000000        0xc src/lib/queue.o
+ .reginfo       0x0000000000000000       0x18 src/lib/queue.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/lib/queue.o
+ .debug_macro   0x0000000000000000      0x760 src/lib/queue.o
+ .debug_macro   0x0000000000000000       0x28 src/lib/queue.o
+ .debug_macro   0x0000000000000000       0x16 src/lib/queue.o
+ .debug_macro   0x0000000000000000       0x2e src/lib/queue.o
+ .debug_macro   0x0000000000000000       0x16 src/lib/queue.o
+ .group         0x0000000000000000        0xc src/lib/runtime.o
+ .reginfo       0x0000000000000000       0x18 src/lib/runtime.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/lib/runtime.o
+ .debug_macro   0x0000000000000000      0x760 src/lib/runtime.o
+ .group         0x0000000000000000        0xc src/mm/heap.o
+ .group         0x0000000000000000        0xc src/mm/heap.o
+ .group         0x0000000000000000        0xc src/mm/heap.o
+ .group         0x0000000000000000        0xc src/mm/heap.o
+ .reginfo       0x0000000000000000       0x18 src/mm/heap.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/mm/heap.o
+ .debug_macro   0x0000000000000000      0x760 src/mm/heap.o
+ .debug_macro   0x0000000000000000       0x28 src/mm/heap.o
+ .debug_macro   0x0000000000000000       0x16 src/mm/heap.o
+ .reginfo       0x0000000000000000       0x18 src/proc/context.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/proc/context.o
+ .group         0x0000000000000000        0xc src/proc/scheduler.o
+ .group         0x0000000000000000        0xc src/proc/scheduler.o
+ .group         0x0000000000000000        0xc src/proc/scheduler.o
+ .group         0x0000000000000000        0xc src/proc/scheduler.o
+ .group         0x0000000000000000        0xc src/proc/scheduler.o
+ .group         0x0000000000000000        0xc src/proc/scheduler.o
+ .reginfo       0x0000000000000000       0x18 src/proc/scheduler.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/proc/scheduler.o
+ .debug_macro   0x0000000000000000      0x760 src/proc/scheduler.o
+ .debug_macro   0x0000000000000000       0x28 src/proc/scheduler.o
+ .debug_macro   0x0000000000000000       0x28 src/proc/scheduler.o
+ .debug_macro   0x0000000000000000       0x16 src/proc/scheduler.o
+ .debug_macro   0x0000000000000000       0x2e src/proc/scheduler.o
+ .debug_macro   0x0000000000000000       0x28 src/proc/scheduler.o
+ .group         0x0000000000000000        0xc src/proc/thread.o
+ .group         0x0000000000000000        0xc src/proc/thread.o
+ .group         0x0000000000000000        0xc src/proc/thread.o
+ .group         0x0000000000000000        0xc src/proc/thread.o
+ .group         0x0000000000000000        0xc src/proc/thread.o
+ .group         0x0000000000000000        0xc src/proc/thread.o
+ .reginfo       0x0000000000000000       0x18 src/proc/thread.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 src/proc/thread.o
+ .debug_macro   0x0000000000000000      0x760 src/proc/thread.o
+ .debug_macro   0x0000000000000000       0x28 src/proc/thread.o
+ .debug_macro   0x0000000000000000       0x28 src/proc/thread.o
+ .debug_macro   0x0000000000000000       0x16 src/proc/thread.o
+ .debug_macro   0x0000000000000000       0x16 src/proc/thread.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                [!provide]                        PROVIDE (_kernel_start = 0x80000000)
+
+.kernel         0x0000000080000000     0x5c54
+ *(.excvec)
+ .excvec        0x0000000080000000      0x438 src/head.o
+                0x0000000080000000                exception_tlb_refill
+                0x0000000080000100                exception_cache_error
+                0x0000000080000180                exception_general
+                0x0000000080000400                start
+ *(.text .text.*)
+ *fill*         0x0000000080000438        0x8 
+ .text          0x0000000080000440      0x110 src/main.o
+                0x0000000080000480                kernel_main
+ .text          0x0000000080000550        0x0 src/head.o
+ .text          0x0000000080000550       0x80 src/debug/code.o
+                0x0000000080000550                debug_dump_function
+ .text          0x00000000800005d0       0x60 src/debug/mm.o
+                0x00000000800005d0                debug_get_base_memory_size
+ .text          0x0000000080000630      0x8c0 src/lib/print.o
+                0x0000000080000630                print_int
+                0x00000000800006f8                printk
+                0x0000000080000e8c                print_string
+                0x0000000080000eb4                puts
+ .text          0x0000000080000ef0      0x180 src/lib/queue.o
+                0x0000000080000ef0                new_node
+                0x0000000080000f20                create_queue
+                0x0000000080000f48                enqueue
+                0x0000000080000fd4                dequeue
+ .text          0x0000000080001070      0x320 src/lib/runtime.o
+                0x0000000080001110                __udivdi3
+                0x0000000080001174                __umoddi3
+                0x00000000800011e4                __divdi3
+                0x00000000800012d4                __moddi3
+ .text          0x0000000080001390      0x480 src/mm/heap.o
+                0x0000000080001390                count_biggest_free_block
+                0x000000008000143c                heap_init
+                0x0000000080001480                push_first
+                0x00000000800014dc                push_back
+                0x00000000800015e8                kmalloc
+                0x00000000800016c0                delete_chunk
+                0x0000000080001744                kfree
+                0x0000000080001770                print_array
+ .text          0x0000000080001810      0x130 src/proc/context.o
+                0x0000000080001810                cpu_switch_context
+ .text          0x0000000080001940       0x90 src/proc/scheduler.o
+                0x0000000080001940                scheduler_init
+                0x0000000080001964                scheduler_add_ready_thread
+                0x0000000080001974                scheduler_remove_thread
+                0x0000000080001984                scheduler_schedule_next
+ .text          0x00000000800019d0      0x190 src/proc/thread.o
+                0x00000000800019d0                threads_init
+                0x00000000800019d8                thread_create
+                0x0000000080001ab4                thread_get_current
+                0x0000000080001ac0                thread_yield
+                0x0000000080001ac8                thread_suspend
+                0x0000000080001adc                thread_finish
+                0x0000000080001ae4                thread_has_finished
+                0x0000000080001af4                thread_wakeup
+                0x0000000080001b24                thread_join
+                0x0000000080001b40                thread_switch_to
+ *(.data)
+ .data          0x0000000080001b60        0x0 src/main.o
+ .data          0x0000000080001b60        0x0 src/head.o
+ .data          0x0000000080001b60        0x0 src/debug/code.o
+ .data          0x0000000080001b60        0x0 src/debug/mm.o
+ .data          0x0000000080001b60        0x0 src/lib/print.o
+ .data          0x0000000080001b60        0x0 src/lib/queue.o
+ .data          0x0000000080001b60        0x0 src/lib/runtime.o
+ .data          0x0000000080001b60        0x0 src/mm/heap.o
+ .data          0x0000000080001b60        0x0 src/proc/context.o
+ .data          0x0000000080001b60        0x0 src/proc/scheduler.o
+ .data          0x0000000080001b60        0x0 src/proc/thread.o
+ *(.rodata .rodata.*)
+ .rodata.str1.4
+                0x0000000080001b60      0x147 src/main.o
+                                        0x148 (size before relaxing)
+ *fill*         0x0000000080001ca7        0x9 
+ .rodata        0x0000000080001cb0       0x20 src/main.o
+ .rodata.str1.4
+                0x0000000080001cd0       0x1b src/debug/code.o
+                                         0x1c (size before relaxing)
+ *fill*         0x0000000080001ceb        0x1 
+ .rodata.str1.4
+                0x0000000080001cec       0x5d src/lib/print.o
+                                         0x60 (size before relaxing)
+ *fill*         0x0000000080001d49        0x3 
+ .rodata.str1.4
+                0x0000000080001d4c       0x2b src/lib/queue.o
+                                         0x2c (size before relaxing)
+ *fill*         0x0000000080001d77        0x1 
+ .rodata.str1.4
+                0x0000000080001d78       0x40 src/mm/heap.o
+ *(.bss .bss.*)
+ *fill*         0x0000000080001db8        0x8 
+ .bss           0x0000000080001dc0        0x0 src/main.o
+ .bss           0x0000000080001dc0        0x0 src/head.o
+ .bss           0x0000000080001dc0        0x0 src/debug/code.o
+ .bss           0x0000000080001dc0        0x0 src/debug/mm.o
+ .bss           0x0000000080001dc0        0x0 src/lib/print.o
+ .bss           0x0000000080001dc0        0x0 src/lib/queue.o
+ .bss           0x0000000080001dc0        0x0 src/lib/runtime.o
+ .bss           0x0000000080001dc0        0x0 src/mm/heap.o
+ .bss           0x0000000080001dc0        0x0 src/proc/context.o
+ .bss           0x0000000080001dc0        0x0 src/proc/scheduler.o
+ .bss           0x0000000080001dc0        0x0 src/proc/thread.o
+ *(COMMON)
+ COMMON         0x0000000080001dc0     0x3e94 src/main.o
+                0x0000000080001dc0                queue
+                0x0000000080001dc4                mem_left
+                0x0000000080001dc8                heap
+                0x0000000080005c4c                biggest_gap_index
+                0x0000000080005c50                running_thread
+                0x0000000080005c54                _kernel_end = .
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x20
+ *(.comment)
+ .comment       0x0000000000000000       0x20 src/main.o
+                                         0x21 (size before relaxing)
+ .comment       0x0000000000000020       0x21 src/debug/code.o
+ .comment       0x0000000000000020       0x21 src/debug/mm.o
+ .comment       0x0000000000000020       0x21 src/lib/print.o
+ .comment       0x0000000000000020       0x21 src/lib/queue.o
+ .comment       0x0000000000000020       0x21 src/lib/runtime.o
+ .comment       0x0000000000000020       0x21 src/mm/heap.o
+ .comment       0x0000000000000020       0x21 src/proc/scheduler.o
+ .comment       0x0000000000000020       0x21 src/proc/thread.o
+
+.pdr            0x0000000000000000      0x580
+ .pdr           0x0000000000000000       0x40 src/main.o
+ .pdr           0x0000000000000040       0x80 src/head.o
+ .pdr           0x00000000000000c0       0x20 src/debug/code.o
+ .pdr           0x00000000000000e0       0x20 src/debug/mm.o
+ .pdr           0x0000000000000100       0x80 src/lib/print.o
+ .pdr           0x0000000000000180       0x80 src/lib/queue.o
+ .pdr           0x0000000000000200       0xa0 src/lib/runtime.o
+ .pdr           0x00000000000002a0      0x100 src/mm/heap.o
+ .pdr           0x00000000000003a0       0x20 src/proc/context.o
+ .pdr           0x00000000000003c0       0x80 src/proc/scheduler.o
+ .pdr           0x0000000000000440      0x140 src/proc/thread.o
+
+.mdebug.abi32   0x0000000000000000        0x0
+ .mdebug.abi32  0x0000000000000000        0x0 src/main.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/debug/code.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/debug/mm.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/lib/print.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/lib/queue.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/lib/runtime.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/mm/heap.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/proc/scheduler.o
+ .mdebug.abi32  0x0000000000000000        0x0 src/proc/thread.o
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000      0x160
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x20 src/main.o
+ .debug_aranges
+                0x0000000000000020       0x20 src/head.o
+ .debug_aranges
+                0x0000000000000040       0x20 src/debug/code.o
+ .debug_aranges
+                0x0000000000000060       0x20 src/debug/mm.o
+ .debug_aranges
+                0x0000000000000080       0x20 src/lib/print.o
+ .debug_aranges
+                0x00000000000000a0       0x20 src/lib/queue.o
+ .debug_aranges
+                0x00000000000000c0       0x20 src/lib/runtime.o
+ .debug_aranges
+                0x00000000000000e0       0x20 src/mm/heap.o
+ .debug_aranges
+                0x0000000000000100       0x20 src/proc/context.o
+ .debug_aranges
+                0x0000000000000120       0x20 src/proc/scheduler.o
+ .debug_aranges
+                0x0000000000000140       0x20 src/proc/thread.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000     0x3b74
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000      0x741 src/main.o
+ .debug_info    0x0000000000000741       0x26 src/head.o
+ .debug_info    0x0000000000000767      0x16e src/debug/code.o
+ .debug_info    0x00000000000008d5       0xfe src/debug/mm.o
+ .debug_info    0x00000000000009d3     0x13e6 src/lib/print.o
+ .debug_info    0x0000000000001db9      0x689 src/lib/queue.o
+ .debug_info    0x0000000000002442      0x4ac src/lib/runtime.o
+ .debug_info    0x00000000000028ee      0x58d src/mm/heap.o
+ .debug_info    0x0000000000002e7b       0x26 src/proc/context.o
+ .debug_info    0x0000000000002ea1      0x4f7 src/proc/scheduler.o
+ .debug_info    0x0000000000003398      0x7dc src/proc/thread.o
+
+.debug_abbrev   0x0000000000000000     0x10a8
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000      0x235 src/main.o
+ .debug_abbrev  0x0000000000000235       0x14 src/head.o
+ .debug_abbrev  0x0000000000000249       0xc5 src/debug/code.o
+ .debug_abbrev  0x000000000000030e       0x98 src/debug/mm.o
+ .debug_abbrev  0x00000000000003a6      0x2d6 src/lib/print.o
+ .debug_abbrev  0x000000000000067c      0x246 src/lib/queue.o
+ .debug_abbrev  0x00000000000008c2      0x1a7 src/lib/runtime.o
+ .debug_abbrev  0x0000000000000a69      0x26d src/mm/heap.o
+ .debug_abbrev  0x0000000000000cd6       0x14 src/proc/context.o
+ .debug_abbrev  0x0000000000000cea      0x15d src/proc/scheduler.o
+ .debug_abbrev  0x0000000000000e47      0x261 src/proc/thread.o
+
+.debug_line     0x0000000000000000     0x1d7e
+ *(.debug_line)
+ .debug_line    0x0000000000000000      0x1b1 src/main.o
+ .debug_line    0x00000000000001b1       0x41 src/head.o
+ .debug_line    0x00000000000001f2       0xd5 src/debug/code.o
+ .debug_line    0x00000000000002c7       0xad src/debug/mm.o
+ .debug_line    0x0000000000000374      0xcb7 src/lib/print.o
+ .debug_line    0x000000000000102b      0x205 src/lib/queue.o
+ .debug_line    0x0000000000001230      0x2af src/lib/runtime.o
+ .debug_line    0x00000000000014df      0x484 src/mm/heap.o
+ .debug_line    0x0000000000001963       0x5c src/proc/context.o
+ .debug_line    0x00000000000019bf      0x167 src/proc/scheduler.o
+ .debug_line    0x0000000000001b26      0x258 src/proc/thread.o
+
+.debug_frame    0x0000000000000000      0x48c
+ *(.debug_frame)
+ .debug_frame   0x0000000000000000       0x4c src/main.o
+ .debug_frame   0x000000000000004c       0x38 src/debug/code.o
+ .debug_frame   0x0000000000000084       0x20 src/debug/mm.o
+ .debug_frame   0x00000000000000a4       0x7c src/lib/print.o
+ .debug_frame   0x0000000000000120       0xa8 src/lib/queue.o
+ .debug_frame   0x00000000000001c8       0xa4 src/lib/runtime.o
+ .debug_frame   0x000000000000026c       0xe0 src/mm/heap.o
+ .debug_frame   0x000000000000034c       0x6c src/proc/scheduler.o
+ .debug_frame   0x00000000000003b8       0xd4 src/proc/thread.o
+
+.debug_str      0x0000000000000000     0x3225
+ *(.debug_str)
+ .debug_str     0x0000000000000000     0x2a75 src/main.o
+                                       0x2b4b (size before relaxing)
+ .debug_str     0x0000000000002a75       0x19 src/head.o
+                                         0x52 (size before relaxing)
+ .debug_str     0x0000000000002a8e       0x50 src/debug/code.o
+                                       0x2261 (size before relaxing)
+ .debug_str     0x0000000000002ade       0x52 src/debug/mm.o
+                                       0x226b (size before relaxing)
+ .debug_str     0x0000000000002b30      0x3ea src/lib/print.o
+                                       0x2a3b (size before relaxing)
+ .debug_str     0x0000000000002f1a       0x54 src/lib/queue.o
+                                       0x24b3 (size before relaxing)
+ .debug_str     0x0000000000002f6e       0x87 src/lib/runtime.o
+                                       0x2160 (size before relaxing)
+ .debug_str     0x0000000000002ff5       0xff src/mm/heap.o
+                                       0x241b (size before relaxing)
+ .debug_str     0x00000000000030f4       0x13 src/proc/context.o
+                                         0x5a (size before relaxing)
+ .debug_str     0x0000000000003107       0x54 src/proc/scheduler.o
+                                       0x2722 (size before relaxing)
+ .debug_str     0x000000000000315b       0xca src/proc/thread.o
+                                       0x25b1 (size before relaxing)
+
+.debug_loc      0x0000000000000000     0x1f59
+ *(.debug_loc)
+ .debug_loc     0x0000000000000000       0x83 src/main.o
+ .debug_loc     0x0000000000000083       0xea src/debug/code.o
+ .debug_loc     0x000000000000016d       0x58 src/debug/mm.o
+ .debug_loc     0x00000000000001c5      0xe5b src/lib/print.o
+ .debug_loc     0x0000000000001020      0x298 src/lib/queue.o
+ .debug_loc     0x00000000000012b8      0x612 src/lib/runtime.o
+ .debug_loc     0x00000000000018ca      0x3fa src/mm/heap.o
+ .debug_loc     0x0000000000001cc4       0x79 src/proc/scheduler.o
+ .debug_loc     0x0000000000001d3d      0x21c src/proc/thread.o
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x0000000000000000      0x600
+ *(.debug_ranges)
+ .debug_ranges  0x0000000000000000      0x3b8 src/lib/print.o
+ .debug_ranges  0x00000000000003b8       0x20 src/lib/queue.o
+ .debug_ranges  0x00000000000003d8      0x188 src/lib/runtime.o
+ .debug_ranges  0x0000000000000560       0x88 src/mm/heap.o
+ .debug_ranges  0x00000000000005e8       0x18 src/proc/thread.o
+
+.gnu.attributes
+                0x0000000000000000       0x10
+ *(.gnu.attributes)
+ .gnu.attributes
+                0x0000000000000000       0x10 src/main.o
+ .gnu.attributes
+                0x0000000000000010       0x10 src/head.o
+ .gnu.attributes
+                0x0000000000000020       0x10 src/debug/code.o
+ .gnu.attributes
+                0x0000000000000030       0x10 src/debug/mm.o
+ .gnu.attributes
+                0x0000000000000040       0x10 src/lib/print.o
+ .gnu.attributes
+                0x0000000000000050       0x10 src/lib/queue.o
+ .gnu.attributes
+                0x0000000000000060       0x10 src/lib/runtime.o
+ .gnu.attributes
+                0x0000000000000070       0x10 src/mm/heap.o
+ .gnu.attributes
+                0x0000000000000080       0x10 src/proc/context.o
+ .gnu.attributes
+                0x0000000000000090       0x10 src/proc/scheduler.o
+ .gnu.attributes
+                0x00000000000000a0       0x10 src/proc/thread.o
+
+/DISCARD/
+ *(.eh_frame)
+ *(.reginfo)
+ *(.MIPS.abiflags)
+LOAD src/main.o
+LOAD src/head.o
+LOAD src/debug/code.o
+LOAD src/debug/mm.o
+LOAD src/lib/print.o
+LOAD src/lib/queue.o
+LOAD src/lib/runtime.o
+LOAD src/mm/heap.o
+LOAD src/proc/context.o
+LOAD src/proc/scheduler.o
+LOAD src/proc/thread.o
+OUTPUT(kernel.raw elf32-tradlittlemips)
+
+.debug_macro    0x0000000000000000      0xc46
+ .debug_macro   0x0000000000000000       0x9c src/main.o
+ .debug_macro   0x000000000000009c      0x760 src/main.o
+ .debug_macro   0x00000000000007fc       0x28 src/main.o
+ .debug_macro   0x0000000000000824       0x28 src/main.o
+ .debug_macro   0x000000000000084c       0x2e src/main.o
+ .debug_macro   0x000000000000087a       0x16 src/main.o
+ .debug_macro   0x0000000000000890       0x2e src/main.o
+ .debug_macro   0x00000000000008be       0x3a src/main.o
+ .debug_macro   0x00000000000008f8       0x16 src/main.o
+ .debug_macro   0x000000000000090e       0x2e src/debug/code.o
+ .debug_macro   0x000000000000093c       0x3a src/debug/mm.o
+ .debug_macro   0x0000000000000976       0x83 src/lib/print.o
+ .debug_macro   0x00000000000009f9       0x1c src/lib/print.o
+ .debug_macro   0x0000000000000a15       0x10 src/lib/print.o
+ .debug_macro   0x0000000000000a25       0x22 src/lib/print.o
+ .debug_macro   0x0000000000000a47       0x5e src/lib/queue.o
+ .debug_macro   0x0000000000000aa5       0x28 src/lib/queue.o
+ .debug_macro   0x0000000000000acd       0x1b src/lib/runtime.o
+ .debug_macro   0x0000000000000ae8       0x4a src/mm/heap.o
+ .debug_macro   0x0000000000000b32       0x10 src/mm/heap.o
+ .debug_macro   0x0000000000000b42       0x78 src/proc/scheduler.o
+ .debug_macro   0x0000000000000bba       0x58 src/proc/thread.o
+ .debug_macro   0x0000000000000c12       0x34 src/proc/thread.o

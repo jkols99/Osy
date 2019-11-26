@@ -7,6 +7,7 @@
 #include <debug.h>
 #include <errno.h>
 #include <lib/print.h>
+#include <lib/queue.h>
 
 /*
  * Prefiexes for test output, used later by check_output.py script.
@@ -56,5 +57,5 @@
 
 /** All kernel test share this signature as only one test is compiled at a time. */
 void kernel_test(void);
-
+void print_queue(const queue_t* queue);
 #endif

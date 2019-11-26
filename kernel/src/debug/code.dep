@@ -1,0 +1,2 @@
+src/debug/code.o: src/debug/code.c include/debug/code.h include/types.h \
+ include/lib/print.h

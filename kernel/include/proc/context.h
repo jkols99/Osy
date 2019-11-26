@@ -59,6 +59,7 @@ typedef struct {
     unative_t gp;
     unative_t fp;
 
+    //nastavit toto
     unative_t sp;
     unative_t ra;
 

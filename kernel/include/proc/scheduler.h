@@ -8,6 +8,9 @@
 #include <proc/thread.h>
 
 queue_t* queue;
+thread_t* running_thread;
+
+inline thread_t* get_current_thread(void) { return running_thread; };
 
 void scheduler_init(void);
 void scheduler_add_ready_thread(thread_t* id);

@@ -48,6 +48,7 @@ KERNEL_SOURCES = \
 	src/debug/code.c \
 	src/debug/mm.c \
 	src/lib/print.c \
+	src/lib/queue.c \
 	src/lib/runtime.c \
 	src/mm/heap.c \
 	src/proc/context.S \

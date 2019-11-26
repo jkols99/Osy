@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University
 
+#include "lib/queue.h"
 #include <debug.h>
 #include <proc/scheduler.h>
 
@@ -36,4 +37,8 @@ void scheduler_remove_thread(thread_t* thread) {
 
 /** Switch to next thread in the queue. */
 void scheduler_schedule_next(void) {
+    thread_t* next_thread = queue->front->key;
+    running_thread = next_thread;
+    (*next_thread->entry_func)(next_thread->data); //chceme context switch
+    running_thread->status = FINISHED;
 }

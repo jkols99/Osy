@@ -6,6 +6,7 @@
 
 #include <errno.h>
 #include <types.h>
+#include <proc/context.h>
 
 /** Thread stack size.
  *
@@ -20,11 +21,26 @@
 /** Thread entry function as you know from pthreads. */
 typedef void* (*thread_entry_func_t)(void*);
 
+//defining enum for thread stauts
+#define READY 0
+#define RUNNING 1
+#define WAITING 2
+#define JOINING 3
+#define FINISHED 4
+typedef int status_t;
+
 /** Information about any existing thread. */
 typedef struct thread thread_t;
 struct thread {
     char name[THREAD_NAME_MAX_LENGTH + 1];
     thread_entry_func_t entry_func;
+    void* data;
+    status_t status;
+    context_t* context; /* maybe */
+    void* stack;
+    void* stack_top;
+    thread_t* waiting_for;
+    thread_t* is_waiting_for_me;
 };
 
 void threads_init(void);

@@ -1,0 +1,127 @@
+
+Discarded input sections
+
+ .reginfo       0x0000000000000000       0x18 boot/loader.o
+ .MIPS.abiflags
+                0x0000000000000000       0x18 boot/loader.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                [!provide]                        PROVIDE (_kernel_start = 0x80000000)
+
+.kernel         0x0000000080000000       0x10
+ *(.excvec)
+ *(.text .text.*)
+ .text          0x0000000080000000       0x10 boot/loader.o
+ *(.data)
+ .data          0x0000000080000010        0x0 boot/loader.o
+ *(.rodata .rodata.*)
+ *(.bss .bss.*)
+ .bss           0x0000000080000010        0x0 boot/loader.o
+ *(COMMON)
+                0x0000000080000010                _kernel_end = .
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment
+ *(.comment)
+
+.pdr            0x0000000000000000       0x20
+ .pdr           0x0000000000000000       0x20 boot/loader.o
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000       0x20
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x20 boot/loader.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000       0x26
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000       0x26 boot/loader.o
+
+.debug_abbrev   0x0000000000000000       0x14
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000       0x14 boot/loader.o
+
+.debug_line     0x0000000000000000       0x3f
+ *(.debug_line)
+ .debug_line    0x0000000000000000       0x3f boot/loader.o
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x0000000000000000       0x55
+ *(.debug_str)
+ .debug_str     0x0000000000000000       0x55 boot/loader.o
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.gnu.attributes
+                0x0000000000000000       0x10
+ *(.gnu.attributes)
+ .gnu.attributes
+                0x0000000000000000       0x10 boot/loader.o
+
+/DISCARD/
+ *(.eh_frame)
+ *(.reginfo)
+ *(.MIPS.abiflags)
+LOAD boot/loader.o
+OUTPUT(loader.raw elf32-tradlittlemips)

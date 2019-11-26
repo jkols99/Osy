@@ -4,20 +4,24 @@
 #include "proc/thread.h"
 
 // A linked list (LL) node to store a queue entry
-struct qnode_t {
+typedef struct qnode qnode_t;
+
+struct qnode {
     thread_t* key;
-    struct qnode_t* next;
+    struct qnode* next;
 };
 
 // The queue, front stores the front node of LL and rear stores the
 // last node of LL
-struct queue_t {
-    struct qnode_t *front, *rear;
+typedef struct queue queue_t;
+
+struct queue {
+    qnode_t *front, *rear;
     size_t size;
 };
 
-struct qnode_t* new_node(thread_t k);
-struct queue_t* create_queue();
-void enqueue(struct queue_t* q, thread_t* k);
-void dequeue(struct queue_t* q, struct thread_t* thread);
+queue_t* create_queue(void);
+qnode_t* new_node(thread_t* k);
+void enqueue(queue_t* q, thread_t* k);
+void dequeue(queue_t* q, thread_t* thread);
 #endif
