@@ -127,9 +127,7 @@ void kernel_test(void) {
         printk(" ... %u threads running ...\n", count);
         thread_yield();
     }
-    printk("Join started %d\n", thread_count);
     for (size_t i = 0; i < thread_count; i++) {
-        printk("sadasdas\n");
         errno_t err = thread_join(threads[i], NULL);
         ktest_assert_errno(err, "thread_join");
     }

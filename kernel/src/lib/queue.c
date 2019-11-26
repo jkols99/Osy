@@ -55,7 +55,7 @@ bool dequeue(queue_t* q, thread_t* thread) {
     }
 
     //if thread is not found, return
-    if (temp == NULL) 
+    if (temp == NULL)
         return false;
 
     //else remove given thread and free its memory
@@ -64,51 +64,46 @@ bool dequeue(queue_t* q, thread_t* thread) {
         before_the_temp->next = temp->next;
         if (temp->next == NULL) // temp is last
             q->rear = before_the_temp;
-    }
-    else { // deleting first one
+    } else { // deleting first one
         if (temp->next == NULL) // 1 in queue
             q->front = q->rear = NULL;
         else // more in queue
-            q->front = q->front->next;       
+            q->front = q->front->next;
     }
 
     kfree(temp);
     return true;
 }
 
+/**
+ * Get next thread in queue
+ * @param where Where to search
+ * @param status Search based on status of the thread
+ * @return Next thread to run
+*/
 thread_t* get_next_ready(queue_t* where, int status) {
     qnode_t* front = where->front;
 
-          //until the end or until status match but not if it is waiting for other thread
-    // while(front != NULL && front->key->status != status && front->key->waiting_for != NULL) {
-    //     front = front-> next;
-    // }
-
-    while(1) {
+    while (1) {
         if (front == NULL)
             return NULL;
-        if (front->key->status == status && front->key->waiting_for == NULL)
+        if (front->key->status == status && front->key->following == NULL)
             return front->key;
         front = front->next;
     }
-
-    // if (front == NULL)
-    //     return NULL;
-    // else
-    // {
-    //     printk("Get next ready found %s with status %d and target status was %d\n", front->key->name, front->key->status, status);
-    //     return front->key;
-    // }
 }
 
-void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill)
-{
+/**
+ * Removes all references
+ * @param queue Where to remove
+ * @param thread_to_kill What references to remove
+*/
+void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill) {
     qnode_t* temp = queue->front;
 
-    while (temp != NULL)
-    {
-        if (temp->key->waiting_for == thread_to_kill)
-            temp->key->waiting_for = NULL;
+    while (temp != NULL) {
+        if (temp->key->following == thread_to_kill)
+            temp->key->following = NULL;
         temp = temp->next;
     }
 }

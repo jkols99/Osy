@@ -5,8 +5,8 @@
 #define _PROC_THREAD_H
 
 #include <errno.h>
-#include <types.h>
 #include <proc/context.h>
+#include <types.h>
 
 /** Thread stack size.
  *
@@ -35,12 +35,12 @@ struct thread {
     char name[THREAD_NAME_MAX_LENGTH + 1];
     thread_entry_func_t entry_func;
     status_t status;
-    context_t* context; /* maybe */
+    context_t* context;
     void* data;
     void* stack;
     void* stack_top;
-    thread_t* following;
-    thread_t* follower;
+    thread_t* following; // thread i am waiting for
+    thread_t* follower; // thread that is waiting for me
 };
 
 void threads_init(void);
