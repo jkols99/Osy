@@ -95,7 +95,7 @@ void printk(const char* format, ...) {
                         print_int((unsigned int)thread->entry_func, targets, 16, false);
                         printer_putchar('\n');
                     }
-                    printk("Status: %d", thread->status);
+                    printk("Status: %d\n", thread->status);
                 } else {
                     const unsigned int pointer_to_print = va_arg(argp, const unsigned int);
                     printer_putchar('0');

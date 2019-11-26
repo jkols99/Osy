@@ -44,6 +44,7 @@ void kernel_test(void) {
 }
 
 void print_queue(const queue_t* queue) {
+    printk("Print starting\n");
     qnode_t* temp = queue->front;
     while (temp != NULL) {
         printk("%pT", temp->key);

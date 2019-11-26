@@ -33,6 +33,7 @@ void threads_init(void) {
  * @retval ENOMEM Not enough memory to complete the operation.
  * @retval INVAL Invalid flags (unused).
  */
+
 errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name) {
     thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
     if (new_thread == NULL)
@@ -71,13 +72,13 @@ thread_t* thread_get_current(void) {
 /** Yield the processor. */
 void thread_yield(void) {
     thread_t* current_thread = get_current_thread();
-    printk("Current running thread: %s\n", current_thread->name);
+    // printk("Current running thread: %s\n", current_thread->name);
     scheduler_remove_thread(current_thread);
-    printk("AFTER REMOVE DUMP\n");
-    dump_queue_info(queue);
+    // printk("AFTER REMOVE DUMP\n");
+    // dump_queue_info(queue);
     scheduler_add_ready_thread(current_thread);
-    printk("After yield dump: \n");
-    dump_queue_info(queue);
+    // printk("After yield dump: \n");
+    // dump_queue_info(queue);
     scheduler_schedule_next();
 } // init -> waiting, worker -> ready
 
@@ -100,6 +101,7 @@ void thread_suspend(void) {
 void thread_finish(void* retval) {
     while (1) {
     }
+    printk("Finish bug\n");
     // panic(); //nesmie to sem dojst
 }
 
@@ -172,11 +174,15 @@ void thread_switch_to(thread_t* thread) {
     if (current_thread == NULL)
     {
         printk("Switching from NULL to %s\n", thread->name);
-        cpu_switch_context((void**)debug_get_stack_pointer(), (void**)&thread->stack_top, 1); //mozno stack pointer, moze byt aj null
+        thread->status = RUNNING;
+        cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
     }
     else
     {
         printk("Switching from %s to %s\n", current_thread->name, thread->name);
+        thread->status = RUNNING;
+        current_thread->status = READY;
+        rotate(current_thread);
         cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
     }
 }

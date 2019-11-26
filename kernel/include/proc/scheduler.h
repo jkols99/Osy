@@ -15,10 +15,18 @@ inline thread_t* get_current_thread(void) { return current_thread; };
 // setter
 inline void set_current_thread(thread_t* new_current_thread) { current_thread = new_current_thread; };
 
+inline void set_current_thread_to_finished(void) { current_thread->status = FINISHED; };
+
 void scheduler_init(void);
 void scheduler_add_ready_thread(thread_t* id);
 void scheduler_remove_thread(thread_t* id);
 void scheduler_schedule_next(void);
+
+
+inline void rotate(thread_t* target_thread) { 
+    scheduler_remove_thread(target_thread);
+    scheduler_add_ready_thread(target_thread);
+};
 
 void dump_queue_info(queue_t* queue);
 #endif
