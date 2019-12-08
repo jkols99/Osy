@@ -40,6 +40,8 @@ static void kill_thread(void) {
 
     scheduler_remove_thread(thread_to_kill);
     thread_to_kill->status = FINISHED;
+    thread_to_kill->follower = NULL;
+    thread_to_kill->following = NULL;
     kfree(thread_to_kill);
     thread_to_kill = NULL;
     if (next_thread == NULL)
@@ -94,6 +96,8 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     new_thread->follower = NULL;
 
     new_thread->stack = kmalloc(THREAD_STACK_SIZE);
+    if (new_thread->stack == NULL)
+        return ENOMEM;
     new_thread->stack_top = (void*)((uintptr_t)new_thread->stack + THREAD_STACK_SIZE - sizeof(context_t));
     context_t* context = (context_t*)new_thread->stack_top;
     context->status = 0xff01;
@@ -212,11 +216,11 @@ errno_t thread_join(thread_t* thread, void** retval) {
     if (thread == NULL)
         return EINVAL;
 
-    if (thread->follower != NULL)
-        return EBUSY;
-
     if (thread->status == FINISHED)
         return EOK;
+
+    if (thread->follower != NULL)
+        return EBUSY;
 
     thread_t* current_thread = get_current_thread();
     thread->follower = current_thread;

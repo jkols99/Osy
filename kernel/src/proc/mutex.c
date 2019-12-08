@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University
 
+#include <lib/print.h>
 #include <proc/mutex.h>
+#include <proc/scheduler.h>
+#include <proc/thread.h>
 
 /** Initializes given mutex.
  *
@@ -10,7 +13,9 @@
  * @retval EOK Mutex was successfully initialized.
  */
 errno_t mutex_init(mutex_t* mutex) {
-    return ENOIMPL;
+    mutex_t new_mutex = { false, NULL };
+    *mutex = new_mutex;
+    return EOK;
 }
 
 /** Destroys given mutex.
@@ -20,6 +25,10 @@ errno_t mutex_init(mutex_t* mutex) {
  * @param mutex Mutex to destroy.
  */
 void mutex_destroy(mutex_t* mutex) {
+    if (mutex->locked)
+        panic("Trying to destroy locked mutex");
+    else {
+    }
 }
 
 /** Locks the mutex.
@@ -28,7 +37,17 @@ void mutex_destroy(mutex_t* mutex) {
  *
  * @param mutex Mutex to be locked.
  */
+static size_t lock_calls = 0;
+
 void mutex_lock(mutex_t* mutex) {
+    lock_calls++;
+    while (mutex->locked) {
+        printk("Lock calls: %u", lock_calls);
+        thread_yield();
+    }
+
+    mutex->locked = true;
+    mutex->holder = get_current_thread();
 }
 
 /** Unlocks the mutex.
@@ -42,6 +61,13 @@ void mutex_lock(mutex_t* mutex) {
  * @param mutex Mutex to be unlocked.
  */
 void mutex_unlock(mutex_t* mutex) {
+    thread_t* current_thread = get_current_thread();
+    if (current_thread != mutex->holder)
+        panic("Wrong thread tried to unlock mutex");
+    else {
+        mutex->holder = NULL;
+        mutex->locked = false;
+    }
 }
 
 /** Try to lock the mutex without waiting.

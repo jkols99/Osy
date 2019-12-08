@@ -4,8 +4,12 @@
 #include <drivers/timer.h>
 #include <exc.h>
 #include <lib/print.h>
+#include <proc/scheduler.h>
 
 void handle_exception_general(context_t* context) {
+    // if (context->t3 == 7) {
+    //     scheduler_schedule_next();
+    // }
 }
 
 bool interrupts_disable(void) {

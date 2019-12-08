@@ -12,10 +12,13 @@
 
 #include <adt/list.h>
 #include <errno.h>
+#include <lib/queue.h>
+#include <proc/scheduler.h>
 #include <types.h>
 
 typedef struct {
     int value;
+    queue_t* thread_queue;
 } sem_t;
 
 errno_t sem_init(sem_t* sem, int value);

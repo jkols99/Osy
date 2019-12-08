@@ -6,6 +6,7 @@
  */
 
 #include <ktest.h>
+#include <lib/print.h>
 #include <proc/sem.h>
 #include <proc/thread.h>
 

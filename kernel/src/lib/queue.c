@@ -17,6 +17,8 @@ qnode_t* new_node(thread_t* k) {
 // A utility function to create an empty queue, chceme link_t, moze dojst pamat
 queue_t* create_queue(void) {
     queue_t* q = (queue_t*)kmalloc(sizeof(queue_t));
+    if (q == NULL)
+        return NULL;
     q->front = q->rear = NULL;
     return q;
 }
@@ -106,4 +108,23 @@ void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill) {
             temp->key->following = NULL;
         temp = temp->next;
     }
+}
+
+thread_t* remove_and_return_first(queue_t* queue) {
+    qnode_t* return_value = queue->front;
+    queue->front = queue->front->next;
+
+    return return_value->key;
+}
+
+size_t queue_size(queue_t* queue) {
+    qnode_t* temp = queue->front;
+    size_t counter = 0;
+
+    while (temp) {
+        counter++;
+        temp = temp->next;
+    }
+
+    return counter;
 }

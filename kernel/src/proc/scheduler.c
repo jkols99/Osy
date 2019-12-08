@@ -3,7 +3,9 @@
 
 #include "lib/queue.h"
 #include <debug.h>
+#include <drivers/timer.h>
 #include <lib/print.h>
+#include <proc/mutex.h>
 #include <proc/scheduler.h>
 
 /** Initialize support for scheduling.
@@ -45,6 +47,6 @@ void scheduler_schedule_next(void) {
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);
-
+    // timer_interrupt_after(25);
     thread_switch_to(next_thread);
 }

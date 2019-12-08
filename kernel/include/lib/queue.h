@@ -25,4 +25,6 @@ thread_t* get_next_ready(queue_t* where, int status);
 void enqueue(queue_t* q, thread_t* k);
 bool dequeue(queue_t* q, thread_t* thread);
 void remove_all_dependencies(queue_t* queue, thread_t* thread_to_kill);
+thread_t* remove_and_return_first(queue_t* queue);
+size_t queue_size(queue_t* queue);
 #endif

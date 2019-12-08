@@ -12,6 +12,7 @@
 /** Mutex synchronization primitive. */
 typedef struct {
     bool locked;
+    thread_t* holder;
 } mutex_t;
 
 errno_t mutex_init(mutex_t* mutex);

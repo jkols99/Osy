@@ -9,6 +9,7 @@
  */
 
 #include <ktest.h>
+#include <lib/print.h>
 #include <proc/sem.h>
 #include <proc/thread.h>
 
@@ -128,11 +129,27 @@ void kernel_test(void) {
         let_them_work();
     }
 
+    printk("Producers:\n");
+
     for (size_t i = 0; i < producer_thread_count; i++) {
+        thread_t* curr = producer_threads[i];
+        printk("Thread: %p, Status: %d, follower: %p, following %p\n", curr, curr->status, curr->follower, curr->following);
+    }
+
+    printk("Consumers:\n");
+
+    for (size_t i = 0; i < consumer_thread_count; i++) {
+        thread_t* curr = consumer_threads[i];
+        printk("Thread: %p, Status: %d, follower: %p, following %p\n", curr, curr->status, curr->follower, curr->following);
+    }
+
+    for (size_t i = 0; i < producer_thread_count; i++) {
+        printk("First for: Index is %u\n", i);
         err = thread_join(producer_threads[i], NULL);
         ktest_assert_errno(err, "thread_join(producer)");
     }
     for (size_t i = 0; i < consumer_thread_count; i++) {
+        printk("Second for: Index is %u\n", i);
         err = thread_join(consumer_threads[i], NULL);
         ktest_assert_errno(err, "thread_join(producer)");
     }

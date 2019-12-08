@@ -8,6 +8,7 @@
  */
 
 #include <ktest.h>
+#include <lib/print.h>
 #include <proc/mutex.h>
 #include <proc/thread.h>
 
