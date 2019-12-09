@@ -4,12 +4,12 @@
 #include <drivers/timer.h>
 #include <exc.h>
 #include <lib/print.h>
-#include <proc/scheduler.h>
+#include <proc/thread.h>
 
 void handle_exception_general(context_t* context) {
-    // if (context->t3 == 7) {
-    //     scheduler_schedule_next();
-    // }
+    if (cp0_status_is_interrupt_pending(context->status, 7)) {
+        thread_yield();
+    }
 }
 
 bool interrupts_disable(void) {

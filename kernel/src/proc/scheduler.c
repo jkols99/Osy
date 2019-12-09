@@ -4,6 +4,7 @@
 #include "lib/queue.h"
 #include <debug.h>
 #include <drivers/timer.h>
+#include <exc.h>
 #include <lib/print.h>
 #include <proc/mutex.h>
 #include <proc/scheduler.h>
@@ -13,7 +14,10 @@
  * Called once at system boot.
  */
 void scheduler_init(void) {
+    interrupts_disable();
     queue = create_queue();
+    timer_interrupt_after(200000);
+    interrupts_restore(false);
 }
 
 /** Marks given thread as ready to be executed.
@@ -43,10 +47,10 @@ bool scheduler_remove_thread(thread_t* thread) {
  * Then looks for waiting threads
  */
 void scheduler_schedule_next(void) {
-
+    interrupts_disable();
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);
-    // timer_interrupt_after(25);
+    interrupts_restore(false);
     thread_switch_to(next_thread);
 }

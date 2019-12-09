@@ -3,6 +3,7 @@
 
 #include <debug/code.h>
 #include <errno.h>
+#include <exc.h>
 #include <lib/print.h>
 #include <mm/heap.h>
 #include <proc/context.h>
@@ -30,6 +31,7 @@ static void* retvalue;
  * and then from queue
 */
 static void kill_thread(void) {
+    interrupts_disable();
     thread_t* thread_to_kill = get_current_thread();
     thread_t* next_thread = NULL;
 
@@ -44,10 +46,13 @@ static void kill_thread(void) {
     thread_to_kill->following = NULL;
     kfree(thread_to_kill);
     thread_to_kill = NULL;
-    if (next_thread == NULL)
+    if (next_thread == NULL) {
+        interrupts_restore(false);
         scheduler_schedule_next();
-    else
+    } else {
+        interrupts_restore(false);
         thread_switch_to(next_thread);
+    }
 }
 
 /**
@@ -78,6 +83,7 @@ static void wrap(thread_t* new_thread) {
  * @retval INVAL Invalid flags (unused).
  */
 errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name) {
+    interrupts_disable();
     thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
 
     if (new_thread == NULL)
@@ -109,6 +115,7 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
 
+    interrupts_restore(false);
     return EOK;
 }
 
@@ -125,9 +132,11 @@ thread_t* thread_get_current(void) {
  * and schedules next thread
 */
 void thread_yield(void) {
+    interrupts_disable();
     thread_t* current_thread = get_current_thread();
     current_thread->status = READY;
     rotate(current_thread);
+    interrupts_restore(false);
     scheduler_schedule_next();
 }
 
@@ -243,6 +252,7 @@ errno_t thread_join(thread_t* thread, void** retval) {
  * @param thread Thread to switch to.
  */
 void thread_switch_to(thread_t* thread) {
+    interrupts_disable();
     thread_t* current_thread = get_current_thread();
     set_current_thread(thread);
     if (current_thread == NULL) {
@@ -251,10 +261,12 @@ void thread_switch_to(thread_t* thread) {
         }
 
         thread->status = RUNNING;
+        interrupts_restore(false);
         cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
     } else {
         thread->status = RUNNING;
         rotate(current_thread);
+        interrupts_restore(false);
         cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
     }
 }

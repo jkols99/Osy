@@ -7,7 +7,6 @@
  */
 
 #include <ktest.h>
-#include <proc/thread.h>
 #include <lib/print.h>
 #include <proc/scheduler.h>
 #include <proc/thread.h>
@@ -24,7 +23,6 @@ static void* empty_worker(void* ignored) {
 
 void kernel_test(void) {
     ktest_start("thread/basic");
-
     thread_t* worker;
     errno_t rc = thread_create(&worker, empty_worker, NULL, 0, "test-worker");
     ktest_assert_errno(rc, "thread_create");
