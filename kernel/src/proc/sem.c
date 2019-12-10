@@ -2,6 +2,7 @@
 // Copyright 2019 Charles University
 
 #include <proc/sem.h>
+#include <exc.h>
 
 /** Initializes given semaphore.
  *
@@ -11,9 +12,11 @@
  * @retval EOK Semaphore was successfully initialized.
  */
 errno_t sem_init(sem_t* sem, int value) {
+    interrupts_disable();
     queue_t* thread_queue = create_queue();
     sem_t new_sem = { value, thread_queue };
     *sem = new_sem;
+    interrupts_restore(false);
     return EOK;
 }
 
@@ -47,11 +50,14 @@ int sem_get_value(sem_t* sem) {
  * @param sem Semaphore to be locked.
  */
 void sem_wait(sem_t* sem) {
+    interrupts_disable();
     if (sem->value == 0) {
         enqueue(sem->thread_queue, get_current_thread());
+        interrupts_restore(false);
         thread_suspend();
     } else
         sem->value--;
+    interrupts_restore(false);
 }
 
 /** Unlocks (ups/signals) the sempahore.
@@ -62,11 +68,13 @@ void sem_wait(sem_t* sem) {
  * @param sem Semaphore to be unlocked.
  */
 void sem_post(sem_t* sem) {
+    interrupts_disable();
     if (sem->value > 0 && queue_size(sem->thread_queue) > 0) {
         thread_t* thread_to_wake_up = remove_and_return_first(sem->thread_queue);
         thread_wakeup(thread_to_wake_up);
     } else
         sem->value = sem->value + 1;
+    interrupts_restore(false);
 }
 
 /** Try to lock the semaphore without waiting.

@@ -30,7 +30,7 @@ static void* retvalue;
  * Killed thread is removed from all dependencies in queue 
  * and then from queue
 */
-static void kill_thread(void) {
+static void kill_thread(bool run_next) {
     interrupts_disable();
     thread_t* thread_to_kill = get_current_thread();
     thread_t* next_thread = NULL;
@@ -46,12 +46,15 @@ static void kill_thread(void) {
     thread_to_kill->following = NULL;
     kfree(thread_to_kill);
     thread_to_kill = NULL;
-    if (next_thread == NULL) {
-        interrupts_restore(false);
-        scheduler_schedule_next();
-    } else {
-        interrupts_restore(false);
-        thread_switch_to(next_thread);
+    if (run_next)
+    {
+        if (next_thread == NULL) {
+            interrupts_restore(false);
+            scheduler_schedule_next();
+        } else {
+            interrupts_restore(false);
+            thread_switch_to(next_thread);
+        }
     }
 }
 
@@ -62,7 +65,7 @@ static void kill_thread(void) {
  */
 static void wrap(thread_t* new_thread) {
     retvalue = (*new_thread->entry_func)(new_thread->data);
-    kill_thread();
+    kill_thread(true);
 }
 
 /** Create a new thread.
@@ -161,7 +164,7 @@ void thread_suspend(void) {
 void thread_finish(void* retval) {
     retvalue = retval;
     while (1) {
-        kill_thread();
+        kill_thread(true);
     }
 }
 
@@ -227,6 +230,12 @@ errno_t thread_join(thread_t* thread, void** retval) {
 
     if (thread->status == FINISHED)
         return EOK;
+
+    if (thread->status < 0 || thread->status > 4) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
+    {
+        kill_thread(false);
+        return EOK;
+    }
 
     if (thread->follower != NULL)
         return EBUSY;
