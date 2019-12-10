@@ -54,7 +54,6 @@ void kernel_test(void) {
         err = thread_join(threads[i], NULL);
         ktest_assert_errno(err, "thread_join");
     }
-
     ktest_assert(total_counter == LOOPS * thread_count, "total_counter is broken");
 
     ktest_passed();

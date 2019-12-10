@@ -11,6 +11,7 @@
 #include <mm/heap.h>
 #include <proc/mutex.h>
 #include <proc/thread.h>
+#include <lib/print.h>
 
 #define THREAD_COUNT 10
 #define CHUNKS 8
@@ -109,7 +110,6 @@ void kernel_test(void) {
     }
 
     stop_work = true;
-
     for (size_t i = 0; i < thread_count; i++) {
         err = thread_join(threads[i], NULL);
         ktest_assert_errno(err, "thread_join");

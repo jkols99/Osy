@@ -8,6 +8,7 @@
 #include <lib/print.h>
 #include <proc/mutex.h>
 #include <proc/scheduler.h>
+#include <proc/thread.h>
 
 /** Initialize support for scheduling.
  *
@@ -16,7 +17,7 @@
 void scheduler_init(void) {
     bool ipl = interrupts_disable();
     queue = create_queue();
-    timer_interrupt_after(200000);
+    timer_interrupt_after(3000000);
     interrupts_restore(ipl);
 }
 

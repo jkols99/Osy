@@ -51,6 +51,7 @@ void kfree(void* ptr) {
 
 //updates biggest continouous block of memory
 size_t count_biggest_free_block(void) {
+    bool ipl = interrupts_disable();
     size_t gap_sum = 0;
     size_t biggest_gap = 0;
     biggest_gap_index = UINT_MAX;
@@ -70,8 +71,10 @@ size_t count_biggest_free_block(void) {
     // printk("Total memory is: %u, biggest gap: %u and ending mem: %u\n",mem_left, biggest_gap, ending_mem);
     //updates the biggest continuous block according to bigger value found
     if (ending_mem > biggest_gap) {
+        interrupts_restore(ipl);
         return ending_mem;
     } else {
+        interrupts_restore(ipl);
         return biggest_gap;
     }
 }
@@ -89,6 +92,7 @@ void heap_init(void) {
 }
 
 size_t push_first(size_t size) {
+    bool ipl = interrupts_disable();
     for (size_t i = heap.last_index; i > 1; i--)
     {
         heap.arr[i] = heap.arr[i - 1];
@@ -99,10 +103,13 @@ size_t push_first(size_t size) {
     heap.arr[1] = (struct mem_chunk) { size, current_address };
 
     heap.last_index++;
+    interrupts_restore(ipl);
     return current_address;
 }
 
 size_t push_back(size_t mem) {
+    bool ipl = interrupts_disable();
+    
     size_t best_index = heap.last_index;
     size_t smallest_remaining_space = UINT_MAX;
     //finds best fit for given memory
@@ -120,6 +127,7 @@ size_t push_back(size_t mem) {
         heap.arr[best_index] = (struct mem_chunk){ mem, current_address };
         heap.last_index++;
         // printk("IF: Ret address: %p\n", current_address);
+        interrupts_restore(ipl);
         return current_address;
     } else {
         // printk("Best index is %u\n", best_index);
@@ -131,12 +139,14 @@ size_t push_back(size_t mem) {
         heap.last_index++;
         heap.arr[best_index + 1] = (struct mem_chunk){ mem, current_address };
         // printk("ELSE: Ret address: %p\n", current_address);
+        interrupts_restore(ipl);
         return current_address;
     }
 }
 
 //returns amount of memory that was freed
 size_t delete_chunk(size_t address) {
+    bool ipl = interrupts_disable();
     size_t add_index = 0;
     //finding index of the item being removed
     for (size_t i = 1; i < heap.last_index; i++) {
@@ -149,6 +159,7 @@ size_t delete_chunk(size_t address) {
     //if we havent found target address, return
     if (add_index == 0)
     {
+        interrupts_restore(ipl);
         return 0;
     }
 
@@ -161,6 +172,7 @@ size_t delete_chunk(size_t address) {
 
     --heap.last_index;
 
+    interrupts_restore(ipl);
     return target_memory;
 }
 

@@ -1,4 +1,4 @@
 src/lib/queue.o: src/lib/queue.c include/lib/queue.h \
  include/proc/thread.h include/errno.h include/types.h \
  include/proc/context.h include/drivers/cp0.h include/lib/print.h \
- include/mm/heap.h
+ include/mm/heap.h include/exc.h

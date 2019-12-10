@@ -30,10 +30,19 @@ static void* retvalue;
  * Killed thread is removed from all dependencies in queue 
  * and then from queue
 */
-static void kill_thread(bool run_next) {
+void kill_thread(bool run_next, bool corrupted) {
     bool ipl = interrupts_disable();
     thread_t* thread_to_kill = get_current_thread();
     thread_t* next_thread = NULL;
+
+    if (corrupted)
+    {
+        thread_to_kill = NULL;
+        scheduler_remove_thread(thread_to_kill);
+        interrupts_restore(ipl);
+        return;
+    }
+    
 
     if (thread_to_kill->follower != NULL)
         next_thread = thread_to_kill->follower;
@@ -64,7 +73,7 @@ static void kill_thread(bool run_next) {
  */
 static void wrap(thread_t* new_thread) {
     retvalue = (*new_thread->entry_func)(new_thread->data);
-    kill_thread(true);
+    kill_thread(true, false);
 }
 
 /** Create a new thread.
@@ -168,7 +177,7 @@ void thread_suspend(void) {
 void thread_finish(void* retval) {
     retvalue = retval;
     while (1) {
-        kill_thread(true);
+        kill_thread(true, false);
     }
 }
 
@@ -239,32 +248,43 @@ errno_t thread_wakeup(thread_t* thread) {
  */
 errno_t thread_join(thread_t* thread, void** retval) {
     bool ipl = interrupts_disable();
-    errno_t ret_err;
+
     if (thread == NULL)
-        ret_err = EINVAL;
-    else if (thread->status == FINISHED)
-        ret_err = EOK;
-    else if (thread->status < 0 || thread->status > 4) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
     {
-        kill_thread(false);
-        ret_err = EOK;
+        interrupts_restore(ipl);   
+        return EINVAL;
     }
-    else if (thread->follower != NULL)
-        ret_err = EBUSY;
-    else
+
+    if (thread->status == FINISHED)
     {
-        thread_t* current_thread = get_current_thread();
-        thread->follower = current_thread;
-        current_thread->following = thread;
-        thread_get_current()->status = WAITING;
-        thread_switch_to(thread);
-        if (retval != NULL) {
-            *retval = retvalue;
-        }
-        ret_err = EOK;
+        interrupts_restore(ipl);
+        return EOK;
     }
+
+    if (thread->status < 0 || thread->status > 4) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
+    {
+        printk("Thread is corrupted\n");
+        kill_thread(false, true);        
+        interrupts_restore(ipl);
+        return EOK;
+    }
+
+    if (thread->follower != NULL)
+    {
+        interrupts_restore(ipl);
+        return EOK;
+    }
+    thread_t* current_thread = get_current_thread();
+    thread->follower = current_thread;
+    current_thread->following = thread;
+    thread_get_current()->status = WAITING;
+    thread_switch_to(thread);
+    if (retval != NULL) {
+        *retval = retvalue;
+    }
+
     interrupts_restore(ipl);
-    return ret_err;
+    return EOK;
 }
 
 /** Switch CPU context tothread a different thread.

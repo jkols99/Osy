@@ -1,2 +1,3 @@
 src/debug/mm.o: src/debug/mm.c include/debug/mm.h include/types.h \
- include/main.h
+ include/main.h include/exc.h include/proc/context.h \
+ include/drivers/cp0.h
