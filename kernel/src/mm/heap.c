@@ -7,9 +7,12 @@
 #include <main.h>
 #include <mm/heap.h>
 #include <types.h>
+#include <proc/mutex.h>
+#include <exc.h>
 
 void* kmalloc(size_t size) {
     //if array is full, return null ( this should not happen, but if )
+    interrupts_disable();
     if (heap.last_index == ARR_LENGTH) {
         return NULL;
     }
@@ -33,14 +36,16 @@ void* kmalloc(size_t size) {
     {
         address = push_back(size);
     }
-
+    interrupts_restore(false);
     return (void*)address;
 }
 
 void kfree(void* ptr) {
+    interrupts_disable();
     size_t freed_memory = delete_chunk((size_t)ptr);
     //adds freed memory back to the total memory
     mem_left += freed_memory;
+    interrupts_restore(false);
 }
 
 //updates biggest continouous block of memory
@@ -70,17 +75,20 @@ size_t count_biggest_free_block(void) {
     }
 }
 
-//initializes important global variables required to run this allocator
+//initializes important global variables required to run this allocator 256 1024 4098
 void heap_init(void) {
+    interrupts_disable();
     mem_left = debug_get_base_memory_size();
     size_t start_address = (size_t)&_kernel_end;
-    // printk("Mem_left: %u\n Start address: %x\n\n", mem_left, start_address);
+    printk("Mem_left: %u\n Start address: %x\n\n", mem_left, start_address);
     // printk("Heap end: %x\n", mem_left + start_address);
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
+    interrupts_restore(false);
 }
 
 size_t push_first(size_t size) {
+    mutex_lock(heap_mutex);
     for (size_t i = heap.last_index; i > 1; i--)
     {
         heap.arr[i] = heap.arr[i - 1];
@@ -91,7 +99,7 @@ size_t push_first(size_t size) {
     heap.arr[1] = (struct mem_chunk) { size, current_address };
 
     heap.last_index++;
-
+    mutex_unlock(heap_mutex);
     return current_address;
 }
 
@@ -130,7 +138,6 @@ size_t push_back(size_t mem) {
 
 //returns amount of memory that was freed
 size_t delete_chunk(size_t address) {
-
     size_t add_index = 0;
     //finding index of the item being removed
     for (size_t i = 1; i < heap.last_index; i++) {
@@ -142,7 +149,9 @@ size_t delete_chunk(size_t address) {
 
     //if we havent found target address, return
     if (add_index == 0)
+    {
         return 0;
+    }
 
     size_t target_memory = heap.arr[add_index].mem_amount;
 
