@@ -1,0 +1,4 @@
+src/exc/exc.o: src/exc/exc.c include/drivers/timer.h \
+ include/drivers/cp0.h include/types.h include/exc.h \
+ include/proc/context.h include/lib/print.h include/proc/thread.h \
+ include/errno.h

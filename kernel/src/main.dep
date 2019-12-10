@@ -1,4 +1,5 @@
 src/main.o: src/main.c include/drivers/machine.h include/ktest.h \
  include/debug.h include/lib/print.h include/types.h include/errno.h \
- include/lib/queue.h include/proc/thread.h include/proc/context.h \
- include/main.h include/mm/heap.h include/proc/scheduler.h
+ include/main.h include/mm/heap.h include/proc/mutex.h include/adt/list.h \
+ include/proc/thread.h include/proc/context.h include/drivers/cp0.h \
+ include/proc/scheduler.h include/lib/queue.h

@@ -60,5 +60,4 @@
 
 /** All kernel test share this signature as only one test is compiled at a time. */
 void kernel_test(void);
-void print_all_queues(void);
 #endif

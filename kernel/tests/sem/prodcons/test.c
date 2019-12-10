@@ -123,7 +123,6 @@ void kernel_test(void) {
         sem_post(&active_threads_guard);
 
         printk("There are %u active threads ...\n", still_active);
-        print_all_queues();
         if (still_active == 0) {
             break;
         }
@@ -131,7 +130,6 @@ void kernel_test(void) {
         let_them_work();
     }
  
-    print_all_queues();
 
     for (size_t i = 0; i < producer_thread_count; i++) {
         printk("First for: Index is %u\n", i);
@@ -150,47 +148,3 @@ void kernel_test(void) {
     ktest_passed();
 }
 
-void print_all_queues(void)
-{
-    printk("Producers with total %d:\n", producer_thread_count);
-
-    for (size_t i = 0; i < producer_thread_count; i++) {
-        thread_t* curr = producer_threads[i];
-        if (curr->status != 0 && curr->status != 4)
-            printk("Thread: %p, Status: %d, follower: %p, following %p\n", curr, curr->status, curr->follower, curr->following);
-    }
-
-    printk("Sem producer queue:\n");
-
-    qnode_t* temp = NULL;
-    
-    temp = queue_empty.thread_queue->front;
-
-    while(temp)
-    {
-        thread_t* curr = temp->key;
-        if (curr->status != 0 && curr->status != 4)
-            printk("Thread: %p, Status: %d, follower: %p, following %p\n", curr, curr->status, curr->follower, curr->following);
-        temp = temp->next;
-    }
-
-    printk("Consumers with total %d:\n", consumer_thread_count);
-
-    for (size_t i = 0; i < consumer_thread_count; i++) {
-        thread_t* curr = consumer_threads[i];
-        if (curr->status != 0 && curr->status != 4)
-            printk("Thread: %p, Status: %d, follower: %p, following %p\n", curr, curr->status, curr->follower, curr->following);
-    }
-
-    printk("Sem consumer queue:\n");
-
-    temp = queue_full.thread_queue->front;
-
-    while(temp)
-    {
-        thread_t* curr = temp->key;
-        if (curr->status != 0 && curr->status != 4)
-            printk("Thread: %p, Status: %d, follower: %p, following %p\n", curr, curr->status, curr->follower, curr->following);
-        temp = temp->next;
-    }
-}

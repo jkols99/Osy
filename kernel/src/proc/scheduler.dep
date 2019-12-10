@@ -1,4 +1,6 @@
 src/proc/scheduler.o: src/proc/scheduler.c include/lib/queue.h \
  include/proc/thread.h include/errno.h include/types.h \
- include/proc/context.h include/debug.h include/drivers/machine.h \
- include/lib/print.h include/proc/scheduler.h
+ include/proc/context.h include/drivers/cp0.h include/debug.h \
+ include/drivers/machine.h include/lib/print.h include/drivers/timer.h \
+ include/exc.h include/proc/mutex.h include/adt/list.h \
+ include/proc/scheduler.h
