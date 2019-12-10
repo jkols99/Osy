@@ -85,9 +85,9 @@ Linker script and memory map
 .debug_frame
  *(.debug_frame)
 
-.debug_str      0x0000000000000000       0x55
+.debug_str      0x0000000000000000       0x5e
  *(.debug_str)
- .debug_str     0x0000000000000000       0x55 boot/loader.o
+ .debug_str     0x0000000000000000       0x5e boot/loader.o
 
 .debug_loc
  *(.debug_loc)

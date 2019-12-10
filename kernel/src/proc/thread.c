@@ -31,7 +31,7 @@ static void* retvalue;
  * and then from queue
 */
 static void kill_thread(bool run_next) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     thread_t* thread_to_kill = get_current_thread();
     thread_t* next_thread = NULL;
 
@@ -49,13 +49,12 @@ static void kill_thread(bool run_next) {
     if (run_next)
     {
         if (next_thread == NULL) {
-            interrupts_restore(false);
             scheduler_schedule_next();
         } else {
-            interrupts_restore(false);
             thread_switch_to(next_thread);
         }
     }
+    interrupts_restore(ipl);
 }
 
 /**
@@ -86,7 +85,7 @@ static void wrap(thread_t* new_thread) {
  * @retval INVAL Invalid flags (unused).
  */
 errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
 
     if (new_thread == NULL)
@@ -118,7 +117,7 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
 
-    interrupts_restore(false);
+    interrupts_restore(ipl);
     return EOK;
 }
 
@@ -127,7 +126,10 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
  * @retval NULL When no thread was started yet.
  */
 thread_t* thread_get_current(void) {
-    return get_current_thread();
+    bool ipl = interrupts_disable();
+    thread_t* ret_thread = get_current_thread();
+    interrupts_restore(ipl);
+    return ret_thread;
 }
 
 /** Yield the processor. 
@@ -135,20 +137,22 @@ thread_t* thread_get_current(void) {
  * and schedules next thread
 */
 void thread_yield(void) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     thread_t* current_thread = get_current_thread();
     current_thread->status = READY;
     rotate(current_thread);
-    interrupts_restore(false);
     scheduler_schedule_next();
+    interrupts_restore(ipl);
 }
 
 /** Current thread stops execution and is not scheduled until woken up. */
 void thread_suspend(void) {
+    bool ipl = interrupts_disable();
     thread_t* current_thread = get_current_thread();
     current_thread->status = SUSPENDED;
     rotate(current_thread);
     scheduler_schedule_next();
+    interrupts_restore(ipl);
 }
 
 /** Terminate currently running thread.
@@ -174,10 +178,15 @@ void thread_finish(void* retval) {
  * @param thread Thread in question.
  */
 bool thread_has_finished(thread_t* thread) {
+    bool ipl = interrupts_disable();
+    bool ret_val;
     if (thread == NULL || thread->status == FINISHED)
-        return true;
-
-    return false;
+        ret_val = true;
+    else
+        ret_val = false;  
+    interrupts_restore(ipl);
+    
+    return ret_val;
 }
 
 /** Wakes-up existing thread.
@@ -195,21 +204,25 @@ bool thread_has_finished(thread_t* thread) {
  * @retval EEXITED Thread already finished its execution.
  */
 errno_t thread_wakeup(thread_t* thread) {
+    bool ipl = interrupts_disable();
+    errno_t ret_err;
     if (thread == NULL || thread->status == WAITING)
-        return EINVAL;
-
-    if (thread->status == FINISHED)
-        return EEXITED;
-
-    if (thread->status == READY || thread->status == RUNNING)
-        return EOK;
-
-    thread->status = READY;
+        ret_err = EINVAL;
+    else if (thread->status == FINISHED)
+        ret_err = EEXITED;
+    else if (thread->status == READY || thread->status == RUNNING)
+        ret_err = EOK;
+    else
+    {
+        thread->status = READY;
+        ret_err = EOK;
+    }
+    
     // according to suspend test, we should call yield here, because wake-upper will die before
     // it can be joined with INIT thread and still return EOK from that join
     // thread_yield();
-
-    return EOK;
+    interrupts_restore(ipl);
+    return ret_err;
 }
 
 /** Joins another thread (waits for it to terminate.
@@ -225,32 +238,33 @@ errno_t thread_wakeup(thread_t* thread) {
  * @retval EINVAL Invalid thread.
  */
 errno_t thread_join(thread_t* thread, void** retval) {
+    bool ipl = interrupts_disable();
+    errno_t ret_err;
     if (thread == NULL)
-        return EINVAL;
-
-    if (thread->status == FINISHED)
-        return EOK;
-
-    if (thread->status < 0 || thread->status > 4) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
+        ret_err = EINVAL;
+    else if (thread->status == FINISHED)
+        ret_err = EOK;
+    else if (thread->status < 0 || thread->status > 4) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
     {
         kill_thread(false);
-        return EOK;
+        ret_err = EOK;
     }
-
-    if (thread->follower != NULL)
-        return EBUSY;
-
-    thread_t* current_thread = get_current_thread();
-    thread->follower = current_thread;
-    current_thread->following = thread;
-    thread_get_current()->status = WAITING;
-
-    thread_switch_to(thread);
-    if (retval != NULL) {
-        *retval = retvalue;
+    else if (thread->follower != NULL)
+        ret_err = EBUSY;
+    else
+    {
+        thread_t* current_thread = get_current_thread();
+        thread->follower = current_thread;
+        current_thread->following = thread;
+        thread_get_current()->status = WAITING;
+        thread_switch_to(thread);
+        if (retval != NULL) {
+            *retval = retvalue;
+        }
+        ret_err = EOK;
     }
-
-    return EOK;
+    interrupts_restore(ipl);
+    return ret_err;
 }
 
 /** Switch CPU context tothread a different thread.
@@ -261,7 +275,7 @@ errno_t thread_join(thread_t* thread, void** retval) {
  * @param thread Thread to switch to.
  */
 void thread_switch_to(thread_t* thread) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     thread_t* current_thread = get_current_thread();
     set_current_thread(thread);
     if (current_thread == NULL) {
@@ -270,12 +284,11 @@ void thread_switch_to(thread_t* thread) {
         }
 
         thread->status = RUNNING;
-        interrupts_restore(false);
         cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
     } else {
         thread->status = RUNNING;
         rotate(current_thread);
-        interrupts_restore(false);
         cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
     }
+    interrupts_restore(ipl);
 }

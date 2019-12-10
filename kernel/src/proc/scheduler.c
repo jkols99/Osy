@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2019 Charles University
+// Copyright 2019 Charles University 15:35:59 -> 15:38:47
 
 #include "lib/queue.h"
 #include <debug.h>
@@ -14,10 +14,10 @@
  * Called once at system boot.
  */
 void scheduler_init(void) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     queue = create_queue();
     timer_interrupt_after(200000);
-    interrupts_restore(false);
+    interrupts_restore(ipl);
 }
 
 /** Marks given thread as ready to be executed.
@@ -28,7 +28,9 @@ void scheduler_init(void) {
  * @param thread Thread to make runnable.
  */
 void scheduler_add_ready_thread(thread_t* thread) {
+    bool ipl = interrupts_disable();
     enqueue(queue, thread);
+    interrupts_restore(ipl);
 }
 
 /** Removes given thread from scheduling.
@@ -39,7 +41,10 @@ void scheduler_add_ready_thread(thread_t* thread) {
  * @param thread Thread to remove from the queue.
  */
 bool scheduler_remove_thread(thread_t* thread) {
-    return dequeue(queue, thread);
+    bool ipl = interrupts_disable();
+    bool successful = dequeue(queue, thread);
+    interrupts_restore(ipl);
+    return successful;
 }
 
 /** Switch to next thread in the queue.
@@ -47,10 +52,10 @@ bool scheduler_remove_thread(thread_t* thread) {
  * Then looks for waiting threads
  */
 void scheduler_schedule_next(void) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);
-    interrupts_restore(false);
     thread_switch_to(next_thread);
+    interrupts_restore(ipl);
 }

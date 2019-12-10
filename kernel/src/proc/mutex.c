@@ -5,6 +5,7 @@
 #include <proc/mutex.h>
 #include <proc/scheduler.h>
 #include <proc/thread.h>
+#include <exc.h>
 
 /** Initializes given mutex.
  *
@@ -13,8 +14,10 @@
  * @retval EOK Mutex was successfully initialized.
  */
 errno_t mutex_init(mutex_t* mutex) {
+    bool ipl = interrupts_disable();
     mutex_t new_mutex = { false, NULL };
     *mutex = new_mutex;
+    interrupts_restore(ipl);
     return EOK;
 }
 
@@ -25,10 +28,12 @@ errno_t mutex_init(mutex_t* mutex) {
  * @param mutex Mutex to destroy.
  */
 void mutex_destroy(mutex_t* mutex) {
+    bool ipl = interrupts_disable();
     if (mutex->locked)
         panic("Trying to destroy locked mutex");
     else {
     }
+    interrupts_restore(ipl);
 }
 
 /** Locks the mutex.
@@ -40,6 +45,7 @@ void mutex_destroy(mutex_t* mutex) {
 static size_t lock_calls = 0;
 
 void mutex_lock(mutex_t* mutex) {
+    bool ipl = interrupts_disable();
     lock_calls++;
     while (mutex->locked) {
         printk("Lock calls: %u", lock_calls);
@@ -48,6 +54,7 @@ void mutex_lock(mutex_t* mutex) {
 
     mutex->locked = true;
     mutex->holder = get_current_thread();
+    interrupts_restore(ipl);
 }
 
 /** Unlocks the mutex.
@@ -61,6 +68,7 @@ void mutex_lock(mutex_t* mutex) {
  * @param mutex Mutex to be unlocked.
  */
 void mutex_unlock(mutex_t* mutex) {
+    bool ipl = interrupts_disable();
     thread_t* current_thread = get_current_thread();
     if (current_thread != mutex->holder)
         panic("Wrong thread tried to unlock mutex");
@@ -68,6 +76,7 @@ void mutex_unlock(mutex_t* mutex) {
         mutex->holder = NULL;
         mutex->locked = false;
     }
+    interrupts_restore(ipl);
 }
 
 /** Try to lock the mutex without waiting.

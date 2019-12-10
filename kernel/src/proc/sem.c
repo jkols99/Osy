@@ -27,10 +27,12 @@ errno_t sem_init(sem_t* sem, int value) {
  * @param sem Semaphore to destroy.
  */
 void sem_destroy(sem_t* sem) {
+    bool ipl = interrupts_disable();
     if (queue_size(sem->thread_queue) > 0)
         panic("Attempting to destroy semaphore with waiting threads");
     else {
     }
+    interrupts_restore(ipl);
 }
 
 /** Get current value of the semaphore.
@@ -39,7 +41,10 @@ void sem_destroy(sem_t* sem) {
  * @return Current semaphore value.
  */
 int sem_get_value(sem_t* sem) {
-    return sem->value;
+    bool ipl = interrupts_disable();
+    int ret_val = sem->value;
+    interrupts_restore(ipl);
+    return ret_val;
 }
 
 /** Locks (downs) the semaphore.
@@ -50,14 +55,13 @@ int sem_get_value(sem_t* sem) {
  * @param sem Semaphore to be locked.
  */
 void sem_wait(sem_t* sem) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     if (sem->value == 0) {
         enqueue(sem->thread_queue, get_current_thread());
-        interrupts_restore(false);
         thread_suspend();
     } else
         sem->value--;
-    interrupts_restore(false);
+    interrupts_restore(ipl);
 }
 
 /** Unlocks (ups/signals) the sempahore.
@@ -68,13 +72,13 @@ void sem_wait(sem_t* sem) {
  * @param sem Semaphore to be unlocked.
  */
 void sem_post(sem_t* sem) {
-    interrupts_disable();
+    bool ipl = interrupts_disable();
     if (sem->value > 0 && queue_size(sem->thread_queue) > 0) {
         thread_t* thread_to_wake_up = remove_and_return_first(sem->thread_queue);
         thread_wakeup(thread_to_wake_up);
     } else
         sem->value = sem->value + 1;
-    interrupts_restore(false);
+    interrupts_restore(ipl);
 }
 
 /** Try to lock the semaphore without waiting.

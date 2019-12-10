@@ -1,4 +1,4 @@
 src/lib/print.o: src/lib/print.c include/adt/list.h include/debug.h \
  include/drivers/machine.h include/lib/print.h include/types.h \
  include/drivers/printer.h include/lib/stdarg.h include/proc/thread.h \
- include/errno.h include/proc/context.h
+ include/errno.h include/proc/context.h include/drivers/cp0.h

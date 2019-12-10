@@ -1,0 +1,5 @@
+tests/sem/prodcons/test.o: tests/sem/prodcons/test.c include/ktest.h \
+ include/debug.h include/drivers/machine.h include/lib/print.h \
+ include/types.h include/errno.h include/proc/sem.h include/adt/list.h \
+ include/lib/queue.h include/proc/thread.h include/proc/context.h \
+ include/drivers/cp0.h include/proc/scheduler.h

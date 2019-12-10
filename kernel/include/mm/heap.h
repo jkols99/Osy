@@ -5,7 +5,6 @@
 #define _MM_HEAP_H
 
 #include <types.h>
-#include <proc/mutex.h>
 
 typedef struct mem_chunk {
     size_t mem_amount;
@@ -23,7 +22,6 @@ typedef struct my_heap {
 struct my_heap heap;
 size_t mem_left;
 size_t biggest_gap_index;
-mutex_t* heap_mutex;
 
 void* kmalloc(size_t size);
 void kfree(void* ptr);
