@@ -94,6 +94,6 @@ errno_t mutex_trylock(mutex_t* mutex) {
 
     mutex->locked = true;
     mutex->holder = get_current_thread();
-    return EOK;
     interrupts_restore(ipl);
+    return EOK;
 }
