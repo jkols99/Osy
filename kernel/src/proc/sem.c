@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University
 
-#include <proc/sem.h>
 #include <exc.h>
+#include <proc/sem.h>
 
 /** Initializes given semaphore.
  *
@@ -91,5 +91,13 @@ void sem_post(sem_t* sem) {
  * @retval EBUSY Semaphore has value of 0 and locking would block.
  */
 errno_t sem_trywait(sem_t* sem) {
-    return ENOIMPL;
+    bool ipl = interrupts_disable();
+    if (sem->value == 0) {
+        interrupts_restore(ipl);
+        return EBUSY;
+    } else {
+        sem->value--;
+        interrupts_restore(ipl);
+        return EOK;
+    }
 }

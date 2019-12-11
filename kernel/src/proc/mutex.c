@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University
 
+#include <exc.h>
 #include <lib/print.h>
 #include <proc/mutex.h>
 #include <proc/scheduler.h>
 #include <proc/thread.h>
-#include <exc.h>
 
 /** Initializes given mutex.
  *
@@ -42,13 +42,10 @@ void mutex_destroy(mutex_t* mutex) {
  *
  * @param mutex Mutex to be locked.
  */
-static size_t lock_calls = 0;
 
 void mutex_lock(mutex_t* mutex) {
     bool ipl = interrupts_disable();
-    lock_calls++;
     while (mutex->locked) {
-        printk("Lock calls: %u", lock_calls);
         thread_yield();
     }
 
@@ -89,5 +86,14 @@ void mutex_unlock(mutex_t* mutex) {
  * @retval EBUSY Mutex is currently locked by a different thread.
  */
 errno_t mutex_trylock(mutex_t* mutex) {
-    return ENOIMPL;
+    bool ipl = interrupts_disable();
+    if (mutex->locked) {
+        interrupts_restore(ipl);
+        return EBUSY;
+    }
+
+    mutex->locked = true;
+    mutex->holder = get_current_thread();
+    return EOK;
+    interrupts_restore(ipl);
 }
