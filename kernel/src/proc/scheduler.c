@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University 15:35:59 -> 15:38:47
 
-#include "lib/queue.h"
 #include <debug.h>
 #include <drivers/timer.h>
 #include <exc.h>
 #include <lib/print.h>
+#include <lib/queue.h>
 #include <proc/mutex.h>
 #include <proc/scheduler.h>
 #include <proc/thread.h>

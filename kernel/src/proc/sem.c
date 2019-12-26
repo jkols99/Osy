@@ -2,6 +2,7 @@
 // Copyright 2019 Charles University
 
 #include <exc.h>
+#include <lib/queue.h>
 #include <proc/sem.h>
 
 /** Initializes given semaphore.

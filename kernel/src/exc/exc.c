@@ -7,7 +7,7 @@
 #include <proc/thread.h>
 
 void handle_exception_general(context_t* context) {
-    if (cp0_status_is_interrupt_pending(context->status, 7)) {
+    if (cp0_cause_is_interrupt_pending(context->status, 7)) {
         timer_interrupt_after(10000000);
         thread_yield();
     }
