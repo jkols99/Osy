@@ -30,6 +30,7 @@ typedef void* (*thread_entry_func_t)(void*);
 #define WAITING 2
 #define SUSPENDED 3
 #define FINISHED 4
+#define KILLED 5
 typedef int status_t;
 
 /** Information about any existing thread. */
@@ -44,6 +45,7 @@ struct thread {
     void* stack_top;
     thread_t* following; // thread i am waiting for
     thread_t* follower; // thread that is waiting for me
+    as_t* address_space;
 };
 void kill_thread(bool run_next, bool corrupted);
 void threads_init(void);

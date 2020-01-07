@@ -3,6 +3,14 @@
         "Makefile": "c",
         "printer.h": "c",
         "main.h": "c",
-        "ktest.h": "c"
+        "ktest.h": "c",
+        "cp0.h": "c",
+        "tlb.h": "c",
+        "as.h": "c",
+        "mm.h": "c",
+        "types.h": "c",
+        "code.h": "c",
+        "frame.h": "c",
+        "heap.h": "c"
     }
 }

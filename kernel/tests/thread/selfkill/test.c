@@ -19,12 +19,11 @@ static void* suicide_worker(void* ignored) {
 }
 
 void kernel_test(void) {
-    ktest_start("thread/basic");
+    ktest_start("thread/selfkill");
 
     thread_t* worker;
     errno_t err = thread_create(&worker, suicide_worker, NULL, 0, "suicide");
     ktest_assert_errno(err, "thread_create");
-
     err = thread_join(worker, NULL);
     ktest_assert(err == EKILLED, "thread_join should signal killed thread");
 

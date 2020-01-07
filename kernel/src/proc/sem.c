@@ -2,6 +2,7 @@
 // Copyright 2019 Charles University
 
 #include <exc.h>
+#include <lib/print.h>
 #include <lib/queue.h>
 #include <proc/sem.h>
 
@@ -74,6 +75,7 @@ void sem_wait(sem_t* sem) {
  */
 void sem_post(sem_t* sem) {
     bool ipl = interrupts_disable();
+    printk("Sem value: %u\n", sem->value);
     if (sem->value > 0 && queue_size(sem->thread_queue) > 0) {
         thread_t* thread_to_wake_up = remove_and_return_first(sem->thread_queue);
         thread_wakeup(thread_to_wake_up);

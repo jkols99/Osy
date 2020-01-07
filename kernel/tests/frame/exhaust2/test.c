@@ -55,13 +55,14 @@ static size_t exhaust_and_free(void) {
         block->previous = previous_block;
         previous_block = block;
     }
-
+    // dump_frame_list();
     dprintk("Freeing it back (starting at %p)\n", previous_block);
 
     // Free it back
     while (previous_block != NULL) {
         block_t* temp = previous_block;
         previous_block = previous_block->previous;
+        printk("Freeing %u blocks from %p add\n", temp->count, temp->phys);
         errno_t err = frame_free(temp->count, temp->phys);
         ktest_assert_errno(err, "frame_free");
     }

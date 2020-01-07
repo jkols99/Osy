@@ -6,9 +6,16 @@
 
 #include <types.h>
 
+#define HEADER -1
+#define CLASSIC 0
+#define FRAME 1
+#define PAGE 2
+typedef int type_t;
+
 typedef struct mem_chunk {
     size_t mem_amount;
     size_t address;
+    type_t type;
 } mem_chunk;
 
 #define ARR_LENGTH 1800
@@ -33,6 +40,7 @@ size_t push_first(size_t size);
 size_t delete_chunk(size_t address);
 
 size_t count_biggest_free_block(void);
+size_t find_first_continuous_block(size_t size);
 void print_array(void);
 
 #endif

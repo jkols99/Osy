@@ -34,11 +34,9 @@ static inline uint8_t get_value_at_addr(uintptr_t addr) {
 static void* as_worker(void* unused) {
     thread_t* self = thread_get_current();
     as_t* as = thread_get_as(self);
-
     size_t size = as_get_size(as);
     size_t size_pages = size / PAGE_SIZE;
     ktest_assert(size_pages > 0, "AS size must be > 0");
-
     /*
      * Need to skip adress 0x0000 that is
      * not mapped.
@@ -49,14 +47,17 @@ static void* as_worker(void* unused) {
     printk("%u pages: checking range [%p, %p)\n", size_pages, data, data_end);
 
     for (uint8_t* it = data; it < data_end; it += STEP) {
+        printk("It: %p, until %p\n", it, data_end);
         *it = get_value_at_addr((uintptr_t)it);
     }
-
+    printk("Got through first for cycle\n");
     for (uint8_t* it = data; it < data_end; it += STEP) {
+        printk("It: %p, until %p\n", it, data_end);
         uint8_t expected = get_value_at_addr((uintptr_t)it);
         uint8_t actual = *it;
         ktest_assert(expected == actual, "value mismatch");
     }
+    printk("Got through second for cycle\n");
 
     accessible_memory_ok = true;
 
@@ -83,14 +84,20 @@ void kernel_test(void) {
         accessible_memory_ok = false;
         thread_t* worker;
         errno_t err = thread_create_new_as(&worker, as_worker, NULL, 0, "worker", i * PAGE_SIZE);
+
         if ((err == ENOMEM) && (i > MIN_PAGES)) {
             break;
         }
         ktest_assert_errno(err, "thread_create");
         err = thread_join(worker, NULL);
+        printk("Out of %u-th join\n", i);
         ktest_assert(err == EKILLED, "thread_join should signal killed thread (got %s)", errno_as_str(err));
-
+        if (accessible_memory_ok)
+            printk("Accessible memory ok true\n");
+        else
+            printk("Accessible memory ok false\n");
         ktest_assert(accessible_memory_ok, "thread killed when touching mapped memory");
+        printk("Survived accessible_memory_ok assert\n");
     }
 
     ktest_passed();

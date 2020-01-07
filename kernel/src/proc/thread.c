@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <exc.h>
 #include <lib/print.h>
+#include <mm/as.h>
 #include <mm/heap.h>
 #include <proc/context.h>
 #include <proc/scheduler.h>
@@ -250,12 +251,17 @@ errno_t thread_join(thread_t* thread, void** retval) {
         return EINVAL;
     }
 
+    if (thread->status == KILLED) {
+        interrupts_restore(ipl);
+        return EKILLED;
+    }
+
     if (thread->status == FINISHED) {
         interrupts_restore(ipl);
         return EOK;
     }
 
-    if (thread->status < 0 || thread->status > 4) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
+    if (thread->status < 0 || thread->status > 5) // consider corrupted threads as invalid, kill them without running next, meaning current thread continues
     {
         printk("Thread is corrupted\n");
         kill_thread(false, true);
@@ -274,6 +280,11 @@ errno_t thread_join(thread_t* thread, void** retval) {
     thread_switch_to(thread);
     if (retval != NULL) {
         *retval = retvalue;
+    }
+
+    if (thread->status == KILLED) {
+        interrupts_restore(ipl);
+        return EKILLED;
     }
 
     interrupts_restore(ipl);
@@ -325,12 +336,21 @@ void thread_switch_to(thread_t* thread) {
  * @retval INVAL Invalid flags (unused).
  */
 errno_t thread_create_new_as(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name, size_t as_size) {
-    return ENOIMPL;
+    bool ipl = interrupts_disable();
+    errno_t ret_val = thread_create(thread_out, entry, data, flags, name);
+    (*thread_out)->address_space = as_create(as_size, 0);
+    if ((*thread_out)->address_space == NULL) {
+        printk("But was null\n");
+        interrupts_restore(ipl);
+        return ENOMEM;
+    }
+    interrupts_restore(ipl);
+    return ret_val;
 }
 
 /** Get address space of given thread. */
 as_t* thread_get_as(thread_t* thread) {
-    return NULL;
+    return thread->address_space;
 }
 
 /** Kills given thread.
@@ -347,5 +367,41 @@ as_t* thread_get_as(thread_t* thread) {
  * @retval EEXITED Thread already finished its execution.
  */
 errno_t thread_kill(thread_t* thread) {
-    return ENOIMPL;
+    bool ipl = interrupts_disable();
+    if (thread == NULL) {
+        interrupts_restore(ipl);
+        return EINVAL;
+    }
+
+    if (thread->status == KILLED) {
+        interrupts_restore(ipl);
+        return EOK;
+    }
+
+    if (thread->status == FINISHED) {
+        interrupts_restore(ipl);
+        return EEXITED;
+    }
+
+    thread_t* current_thread = get_current_thread();
+
+    thread_t* thread_to_kill = thread;
+
+    remove_all_dependencies(queue, thread_to_kill);
+    scheduler_remove_thread(thread_to_kill);
+
+    thread_to_kill->status = KILLED;
+    thread_to_kill->follower = NULL;
+    thread_to_kill->following = NULL;
+    kfree(thread_to_kill);
+    thread_to_kill = NULL;
+
+    if (thread == current_thread) {
+        interrupts_restore(ipl);
+        scheduler_schedule_next();
+        return EOK;
+    } else {
+        interrupts_restore(ipl);
+        return EOK;
+    }
 }
