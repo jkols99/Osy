@@ -65,7 +65,7 @@ size_t count_biggest_free_block(void) {
     biggest_gap_index = UINT_MAX;
     // print_array();
     //sums all gaps in order to count memory after last index + finds biggest gap between memory chunks
-    for (size_t i = 0; i < heap.last_index - 1; i++) {
+    for (size_t i = 1; i < heap.last_index - 1; i++) {
         size_t gap = heap.arr[i + 1].address - (heap.arr[i].address + heap.arr[i].mem_amount);
         if (gap > 0)
             gap_sum += gap;
