@@ -34,5 +34,6 @@ size_t delete_chunk(size_t address);
 
 size_t count_biggest_free_block(void);
 void print_array(void);
+void kmalloc_at(size_t index, size_t count, size_t starting_address);
 
 #endif

@@ -380,7 +380,6 @@ static void* checked_frame_alloc(size_t size) {
     if (err != EOK) {
         return NULL;
     }
-
     void* data = (void*)(0x80000000 + phys);
 
     test_overlap(data, size);
@@ -469,6 +468,7 @@ static void fill_block(mem_block_t* blk) {
     uint8_t *pos, *end;
 
     for (pos = blk->addr, end = pos + blk->size; pos < end; pos++) {
+        // printk("Writing to address %p\n", pos);
         *pos = expected_value(blk, pos);
     }
 }
@@ -543,7 +543,6 @@ static void do_subphase(phase_t* phase, subphase_t* subphase) {
             alloc = FRAME_SIZE * (phase->alloc.min_count + (get_rand() % (phase->alloc.max_count - phase->alloc.min_count + 1)));
 
             mem_block_t* blk = alloc_block(alloc);
-
             if (phase->alloc.top < mem_allocated)
                 phase->alloc.top = mem_allocated;
 

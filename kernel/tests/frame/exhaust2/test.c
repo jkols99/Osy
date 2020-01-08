@@ -57,7 +57,8 @@ static size_t exhaust_and_free(void) {
     }
     printk("Out of first while(1)\n");
     dprintk("Freeing it back (starting at %p)\n", previous_block);
-    print_frame_array();
+    // print_frame_array();
+    // print_array();
     // Free it back
     while (previous_block != NULL) {
         block_t* temp = previous_block;

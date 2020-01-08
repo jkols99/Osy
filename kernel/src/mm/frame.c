@@ -30,14 +30,37 @@ void frame_init(void) {
     interrupts_restore(ipl);
 }
 
-static size_t find_place_for_new_alloc(size_t size) {
+static size_t find_place_for_new_alloc(size_t address) {
     for (size_t i = 1; i < frame_container.last_index - 1; i++) {
-        size_t gap = frame_container.arr[i + 1].phys - (frame_container.arr[i].phys + FRAME_SIZE);
-        if (gap >= size)
-            return i;
+        if (frame_container.arr[i].phys > address)
+            return i - 1;
     }
-
     return frame_container.last_index - 1;
+}
+
+static size_t allign_to_4k(size_t value) {
+    return value + (FRAME_SIZE - (value % FRAME_SIZE));
+}
+
+static size_t find_place_on_heap(size_t count) {
+    for (size_t i = 1; i < heap.last_index - 1; i++) {
+        size_t ith_offset = heap.arr[i].address + heap.arr[i].mem_amount;
+        size_t ref_offset = allign_to_4k(ith_offset);
+
+        if (ref_offset > heap.arr[i + 1].address)
+            continue;
+
+        if (heap.arr[i + 1].address - ref_offset >= count * FRAME_SIZE) {
+            size_t starting_address = ref_offset;
+            kmalloc_at(i, count, starting_address);
+            return starting_address - DIFF;
+        }
+    }
+    size_t last_offset = heap.arr[heap.last_index - 1].address + heap.arr[heap.last_index - 1].mem_amount;
+    size_t last_start_address = allign_to_4k(last_offset);
+
+    kmalloc_at(heap.last_index - 1, count, last_start_address);
+    return last_start_address - DIFF;
 }
 
 /**
@@ -56,7 +79,17 @@ static size_t find_place_for_new_alloc(size_t size) {
 errno_t frame_alloc(size_t count, uintptr_t* phys) {
     bool ipl = interrupts_disable();
     if (frame_container.last_index + count >= ARR_LEN) {
-        printk("Array full\n");
+        // printk("Frame array full\n");
+        return ENOMEM;
+    }
+
+    if (heap.last_index + count >= ARR_LENGTH) {
+        // printk("Heap array full\n");
+        return ENOMEM;
+    }
+
+    if (frame_container.arr[frame_container.last_index - 1].phys + count * FRAME_SIZE >= 0x20000000) {
+        // printk("Out of mem bounds\n");
         return ENOMEM;
     }
 
@@ -65,19 +98,28 @@ errno_t frame_alloc(size_t count, uintptr_t* phys) {
         printk("ENOMEM in frame_alloc\n");
         return ENOMEM;
     }
-    size_t starting_index = find_place_for_new_alloc(count * FRAME_SIZE);
+
+    size_t starting_address = find_place_on_heap(count);
+
+    size_t starting_index = find_place_for_new_alloc(starting_address);
+
+    // printk("Malloc start, heap add %p, frame add %p, count %u\n", starting_address + DIFF, starting_address, count);
+    // print_frame_array();
 
     for (size_t i = frame_container.last_index - 1; i > starting_index; i--) {
         frame_container.arr[i + count] = frame_container.arr[i];
     }
+
     for (size_t i = 0; i < count; i++) {
-        frame_container.arr[starting_index + 1 + i] = (frame_t){ frame_container.arr[starting_index].phys + FRAME_SIZE * (i + 1) };
+        frame_container.arr[starting_index + 1 + i] = (frame_t){ starting_address + FRAME_SIZE * i };
     }
+
     mem_left -= count * FRAME_SIZE;
     frame_container.last_index += count;
 
-    *phys = frame_container.arr[starting_index].phys + FRAME_SIZE;
-    printk("Allocated %u frames at %u\n", count, *phys);
+    *phys = starting_address;
+    // printk("Malloc end\n");
+    // print_frame_array();
     interrupts_restore(ipl);
     return EOK;
 }
@@ -98,27 +140,40 @@ errno_t frame_alloc(size_t count, uintptr_t* phys) {
  */
 errno_t frame_free(size_t count, uintptr_t phys) {
     bool ipl = interrupts_disable();
-    size_t starting_index = 0;
+    size_t starting_index = ARR_LEN + 1;
     for (size_t i = 1; i < frame_container.last_index; i++) {
         if (phys == frame_container.arr[i].phys) {
             starting_index = i;
             break;
         }
     }
-    printk("Starting index is %u, last index: %u, count: %u\n", starting_index, frame_container.last_index, count);
 
-    if (starting_index == 0)
+    if (starting_index == ARR_LEN + 1) {
+        // printk("Looking for phys %p, not found\n", phys);
         return ENOENT;
-    if (starting_index + count > frame_container.last_index)
-        return EBUSY;
+    }
 
-    for (size_t i = starting_index; i < starting_index + count; i++) {
+    if (starting_index + count > frame_container.last_index) {
+        // printk("Asked to free frames over array bounds\n");
+        return EBUSY;
+    }
+
+    // printk("Free start, freeing %u from %p on index start %u\n", count, phys, starting_index);
+    // if (phys == 0xb000)
+    //     print_frame_array();
+
+    for (size_t i = starting_index; i < frame_container.last_index - 1 - count; i++) {
         frame_container.arr[i] = frame_container.arr[i + count];
     }
 
-    mem_left += count * FRAME_SIZE;
-    frame_container.last_index -= count;
+    for (size_t i = 0; i < count; i++) {
+        kfree((void*)(phys + i * FRAME_SIZE + DIFF));
+    }
 
+    frame_container.last_index -= count;
+    // printk("Free end\n");
+    // if (phys == 0xb000)
+    //     print_frame_array();
     interrupts_restore(ipl);
     return EOK;
 }

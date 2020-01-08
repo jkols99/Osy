@@ -6,8 +6,21 @@
 #include <exc.h>
 #include <lib/print.h>
 #include <main.h>
+#include <mm/frame.h>
 #include <mm/heap.h>
 #include <types.h>
+
+void kmalloc_at(size_t index, size_t count, size_t starting_address) {
+    for (size_t i = heap.last_index - 1; i > index; --i) {
+        heap.arr[i + count] = heap.arr[i];
+    }
+
+    heap.last_index += count;
+
+    for (size_t i = 0; i < count; i++) {
+        heap.arr[index + i + 1] = (mem_chunk){ FRAME_SIZE, starting_address + FRAME_SIZE * i };
+    }
+}
 
 void* kmalloc(size_t size) {
     //if array is full, return null ( this should not happen, but if )
@@ -173,7 +186,7 @@ size_t delete_chunk(size_t address) {
 //prints array for testing purposes
 void print_array(void) {
     bool ipl = interrupts_disable();
-    printk("Header is address: %u, mem: %u\n", heap.arr[0].address, heap.arr[0].mem_amount);
+    printk("Header is address: %p, mem: %u\n", heap.arr[0].address, heap.arr[0].mem_amount);
     for (size_t i = 1; i < heap.last_index; ++i) {
         printk("i: %u, address: %p, mem: %u\n", i, heap.arr[i].address, heap.arr[i].mem_amount);
     }
