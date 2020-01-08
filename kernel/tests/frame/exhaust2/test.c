@@ -4,6 +4,7 @@
 #include "../tframe.h"
 #include <ktest.h>
 #include <mm/frame.h>
+#include <mm/heap.h>
 #include <types.h>
 
 #define MIN_SIZE 1
@@ -26,14 +27,13 @@ struct block {
 
 static size_t exhaust_and_free(void) {
     block_t* previous_block = NULL;
-
     size_t allocation_size = START_SIZE;
     size_t allocation_count = 0;
     while (1) {
         uintptr_t phys;
         errno_t err = frame_alloc(allocation_size, &phys);
         if (err == ENOMEM) {
-            dprintk("Failed to allocate %u frames...\n", allocation_size);
+            printk("Failed to allocate %u frames...\n", allocation_size);
             allocation_size = allocation_size / 2;
             if (allocation_size < MIN_SIZE) {
                 break;
@@ -57,12 +57,12 @@ static size_t exhaust_and_free(void) {
     }
     printk("Out of first while(1)\n");
     dprintk("Freeing it back (starting at %p)\n", previous_block);
-
+    print_frame_array();
     // Free it back
     while (previous_block != NULL) {
         block_t* temp = previous_block;
         previous_block = previous_block->previous;
-        // printk("Freeing %u blocks from %p add\n", temp->count, temp->phys);
+        printk("Freeing %u blocks from %p add\n", temp->count, temp->phys);
         errno_t err = frame_free(temp->count, temp->phys);
         ktest_assert_errno(err, "frame_free");
     }

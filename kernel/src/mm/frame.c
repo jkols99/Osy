@@ -5,17 +5,40 @@
 #include <debug/mm.h>
 #include <exc.h>
 #include <lib/print.h>
-#include <main.h>
 #include <mm/frame.h>
 #include <mm/heap.h>
 #include <types.h>
+
+void print_frame_array(void) {
+    printk("Printing array...\n");
+    for (size_t i = 0; i < frame_container.last_index; i++) {
+        printk("%u-th frame with phys: %p\n", i, frame_container.arr[i].phys);
+    }
+    printk("Done printing array...\n");
+}
 
 /**
  * Initializes frame allocator.
  *
  * Called once at system boot.
  */
-void frame_init(void) {}
+void frame_init(void) {
+    bool ipl = interrupts_disable();
+    frame_container.arr[0] = (frame_t){ START_ADD };
+    frame_container.last_index = 1;
+    print_frame_array();
+    interrupts_restore(ipl);
+}
+
+static size_t find_place_for_new_alloc(size_t size) {
+    for (size_t i = 1; i < frame_container.last_index - 1; i++) {
+        size_t gap = frame_container.arr[i + 1].phys - (frame_container.arr[i].phys + FRAME_SIZE);
+        if (gap >= size)
+            return i;
+    }
+
+    return frame_container.last_index - 1;
+}
 
 /**
  * Allocate continuous sequence of physical frames.
@@ -32,37 +55,30 @@ void frame_init(void) {}
  */
 errno_t frame_alloc(size_t count, uintptr_t* phys) {
     bool ipl = interrupts_disable();
-    size_t required_mem = FRAME_SIZE * count;
-    size_t biggest_free_block = count_biggest_free_block();
-    printk("Required mem: %u, biggest free: %u\n", required_mem, biggest_free_block);
-    if (required_mem > biggest_free_block)
+    if (frame_container.last_index + count >= ARR_LEN) {
+        printk("Array full\n");
         return ENOMEM;
-    size_t starting_offset_index = find_first_continuous_block(FRAME_SIZE * count);
-    size_t starting_offset_address = heap.arr[starting_offset_index].address + heap.arr[starting_offset_index].mem_amount;
-    for (size_t i = heap.last_index + count - 1; i > starting_offset_index + 1; i--) {
-        heap.arr[i] = heap.arr[i - count];
     }
 
-    for (size_t i = 0; i < count; i++) {
-        heap.arr[starting_offset_index + 1 + i] = (struct mem_chunk){ FRAME_SIZE, starting_offset_address + FRAME_SIZE * i, FRAME };
-        heap.last_index++;
+    size_t required_mem = FRAME_SIZE * count;
+    if (required_mem > mem_left) {
+        printk("ENOMEM in frame_alloc\n");
+        return ENOMEM;
     }
-    phys = (uintptr_t*)starting_offset_address;
-    mem_left -= required_mem;
-    printk("Phys is: %p\n", phys);
+    size_t starting_index = find_place_for_new_alloc(count * FRAME_SIZE);
+
+    for (size_t i = frame_container.last_index - 1; i > starting_index; i--) {
+        frame_container.arr[i + count] = frame_container.arr[i];
+    }
+    for (size_t i = 0; i < count; i++) {
+        frame_container.arr[starting_index + 1 + i] = (frame_t){ frame_container.arr[starting_index].phys + FRAME_SIZE * (i + 1) };
+    }
+    mem_left -= count * FRAME_SIZE;
+    frame_container.last_index += count;
+
+    *phys = frame_container.arr[starting_index].phys + FRAME_SIZE;
+    printk("Allocated %u frames at %u\n", count, *phys);
     interrupts_restore(ipl);
-    return EOK;
-}
-
-static errno_t remove_frames_from_index(size_t target_index, size_t count) {
-    for (size_t i = 0; i < count; i++) {
-        mem_chunk current_mem_chunk = heap.arr[target_index + i];
-        if (current_mem_chunk.type != FRAME)
-            return EBUSY;
-        current_mem_chunk = heap.arr[target_index + count];
-        heap.last_index--;
-        mem_left -= FRAME_SIZE;
-    }
     return EOK;
 }
 
@@ -81,15 +97,28 @@ static errno_t remove_frames_from_index(size_t target_index, size_t count) {
  * @retval EBUSY Some frames were not allocated (double free).
  */
 errno_t frame_free(size_t count, uintptr_t phys) {
-    // printk("Freeing %u frames from %p starting address\n", count, phys);
     bool ipl = interrupts_disable();
-    errno_t ret_val = EOK;
-    for (size_t i = 1; i < heap.last_index - 1; i++) {
-        if (phys == heap.arr[i].address) {
-            ret_val = remove_frames_from_index(i, count);
+    size_t starting_index = 0;
+    for (size_t i = 1; i < frame_container.last_index; i++) {
+        if (phys == frame_container.arr[i].phys) {
+            starting_index = i;
             break;
         }
     }
+    printk("Starting index is %u, last index: %u, count: %u\n", starting_index, frame_container.last_index, count);
+
+    if (starting_index == 0)
+        return ENOENT;
+    if (starting_index + count > frame_container.last_index)
+        return EBUSY;
+
+    for (size_t i = starting_index; i < starting_index + count; i++) {
+        frame_container.arr[i] = frame_container.arr[i + count];
+    }
+
+    mem_left += count * FRAME_SIZE;
+    frame_container.last_index -= count;
+
     interrupts_restore(ipl);
-    return ret_val;
+    return EOK;
 }

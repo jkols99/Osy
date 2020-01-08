@@ -21,9 +21,11 @@ void kernel_test(void) {
     size_t allocation_size = START_SIZE;
     while (1) {
         uintptr_t phys;
+        printk("Trying to allocate %u frames\n", allocation_size);
         errno_t err = frame_alloc(allocation_size, &phys);
+        printk("Allocated %u frames\n", allocation_size);
         if (err == ENOMEM) {
-            dprintk("Failed to allocate %u frames...\n", allocation_size);
+            printk("Failed to allocate %u frames...\n", allocation_size);
             allocation_size = allocation_size / 2;
             if (allocation_size < MIN_SIZE) {
                 break;
@@ -31,9 +33,11 @@ void kernel_test(void) {
             continue;
         }
         ktest_assert_errno(err, "frame_alloc");
+        printk("Before check frame alloc\n");
         ktest_check_frame_alloc_result(allocation_size, phys);
+        printk("After check frame alloc\n");
 
-        dprintk("Allocated %u frames at 0x%x\n", allocation_size, phys);
+        printk("Allocated %u frames at 0x%x\n", allocation_size, phys);
 
         allocation_count++;
         ktest_assert(allocation_count < MAX_ALLOCATIONS,

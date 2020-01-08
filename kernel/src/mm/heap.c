@@ -39,16 +39,6 @@ void* kmalloc(size_t size) {
     return (void*)address;
 }
 
-// finds index of first continuous block of given size
-size_t find_first_continuous_block(size_t size) {
-    for (size_t i = 0; i < heap.last_index - 1; i++) {
-        size_t gap = heap.arr[i + 1].address - (heap.arr[i].address + heap.arr[i].mem_amount);
-        if (gap >= size)
-            return i;
-    }
-    return heap.last_index - 1;
-}
-
 void kfree(void* ptr) {
     bool ipl = interrupts_disable();
     size_t freed_memory = delete_chunk((size_t)ptr);
@@ -92,7 +82,7 @@ void heap_init(void) {
     bool ipl = interrupts_disable();
     mem_left = debug_get_base_memory_size();
     size_t start_address = (size_t)&_kernel_end;
-    heap.arr[0] = (struct mem_chunk){ 0, start_address, HEADER };
+    heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
     interrupts_restore(ipl);
 }
@@ -105,7 +95,7 @@ size_t push_first(size_t size) {
 
     size_t current_address = heap.arr[0].address + heap.arr[0].mem_amount;
 
-    heap.arr[1] = (struct mem_chunk){ size, current_address, CLASSIC };
+    heap.arr[1] = (struct mem_chunk){ size, current_address };
 
     heap.last_index++;
     interrupts_restore(ipl);
@@ -129,7 +119,7 @@ size_t push_back(size_t mem) {
     //if not found, append at the end
     if (best_index == heap.last_index) {
         size_t current_address = heap.arr[best_index - 1].address + heap.arr[best_index - 1].mem_amount;
-        heap.arr[best_index] = (struct mem_chunk){ mem, current_address, CLASSIC };
+        heap.arr[best_index] = (struct mem_chunk){ mem, current_address };
         heap.last_index++;
         // printk("IF: Ret address: %p\n", current_address);
         interrupts_restore(ipl);
@@ -142,7 +132,7 @@ size_t push_back(size_t mem) {
         }
         size_t current_address = heap.arr[best_index].address + heap.arr[best_index].mem_amount;
         heap.last_index++;
-        heap.arr[best_index + 1] = (struct mem_chunk){ mem, current_address, CLASSIC };
+        heap.arr[best_index + 1] = (struct mem_chunk){ mem, current_address };
         // printk("ELSE: Ret address: %p\n", current_address);
         interrupts_restore(ipl);
         return current_address;
@@ -155,7 +145,7 @@ size_t delete_chunk(size_t address) {
     size_t add_index = 0;
     //finding index of the item being removed
     for (size_t i = 1; i < heap.last_index; i++) {
-        if (address == heap.arr[i].address && heap.arr[i].type == CLASSIC) {
+        if (address == heap.arr[i].address) {
             add_index = i;
             break;
         }
@@ -185,7 +175,7 @@ void print_array(void) {
     bool ipl = interrupts_disable();
     printk("Header is address: %u, mem: %u\n", heap.arr[0].address, heap.arr[0].mem_amount);
     for (size_t i = 1; i < heap.last_index; ++i) {
-        printk("i: %u, address: %u, mem: %u\n", i, heap.arr[i].address, heap.arr[i].mem_amount);
+        printk("i: %u, address: %p, mem: %u\n", i, heap.arr[i].address, heap.arr[i].mem_amount);
     }
     interrupts_restore(ipl);
 }

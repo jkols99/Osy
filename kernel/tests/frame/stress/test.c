@@ -464,6 +464,7 @@ static inline uint8_t expected_value(mem_block_t* blk, uint8_t* pos) {
  *
  * Fills the memory block controlled by @blk with data.
  */
+
 static void fill_block(mem_block_t* blk) {
     uint8_t *pos, *end;
 
