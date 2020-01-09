@@ -5,6 +5,7 @@
 #include <exc.h>
 #include <lib/print.h>
 #include <mm/as.h>
+#include <mm/frame.h>
 #include <mm/heap.h>
 
 /** Initializes support for address spaces.
@@ -13,23 +14,16 @@
  */
 void as_init(void) {
     bool ipl = interrupts_disable();
-    list_init(&as_list);
-    lo0 = 0x13;
-    lo1 = 0x17;
-    hi = (uintptr_t)PAGE_SIZE;
-    next_asid = 0x1;
+    as_container.last_index = 0;
+    next_asid = 1;
     interrupts_restore(ipl);
 }
 
-static void increment_globals() {
-    bool ipl = interrupts_disable();
-    printk("Before: lo0=%d, lo1=%d, hi=%d, next_asid=%d\n", lo0, lo1, hi, next_asid);
-    lo0 = lo1;
-    lo1 += 4;
-    hi += (uintptr_t)PAGE_SIZE;
-    next_asid += 1;
-    printk("After: lo0=%d, lo1=%d, hi=%d, next_asid=%d\n", lo0, lo1, hi, next_asid);
-    interrupts_restore(ipl);
+static void print_as_container() {
+    for (size_t i = 0; i < as_container.last_index; i++) {
+        as_t ith_as = as_container.arr[i];
+        printk("As with phys mapped to %p, size %u, and asid %u\n", ith_as.phys, ith_as.size, ith_as.asid);
+    }
 }
 
 /** Create new address space.
@@ -41,34 +35,29 @@ static void increment_globals() {
  */
 as_t* as_create(size_t size, unsigned int flags) {
     bool ipl = interrupts_disable();
-    as_item_t* new_as_item = (as_item_t*)kmalloc(sizeof(as_item_t));
-    if (new_as_item == NULL) {
-        printk("As item malloc failed\n");
-        interrupts_restore(ipl);
-        return NULL;
-    }
-    new_as_item->as = (as_t*)kmalloc(sizeof(as_t));
-    if (new_as_item->as == NULL) {
-        printk("As malloc failed\n");
+
+    if (as_container.last_index == ARR_LN) {
+        printk("As container full\n");
         interrupts_restore(ipl);
         return NULL;
     }
 
-    new_as_item->as->size = size;
-    new_as_item->as->phys_to = lo1;
-    new_as_item->as->phys_from = lo0;
-    new_as_item->as->va_from = hi;
+    size_t alligned_size = allign_to_4k(size);
 
-    cp0_write_pagemask_4k();
-    cp0_write_entrylo0(lo0, true, true, false);
-    cp0_write_entrylo1(lo1, true, true, false);
-    cp0_write_entryhi(hi, next_asid);
-    cp0_tlb_write_random();
-    increment_globals();
+    uintptr_t phys;
+    errno_t err = frame_alloc(alligned_size / FRAME_SIZE, &phys);
+    if (err == ENOMEM) {
+        printk("ENOMEM for new as\n");
+        interrupts_restore(ipl);
+        return NULL;
+    }
+    printk("Next asid %u\n", next_asid);
+    as_container.arr[as_container.last_index++] = (as_t){ alligned_size, next_asid++, phys };
 
-    list_append(&as_list, &new_as_item->my_list_link);
+    print_as_container();
+
     interrupts_restore(ipl);
-    return new_as_item->as;
+    return &as_container.arr[as_container.last_index - 1];
 }
 
 /** Get size of given address space (in bytes). */
@@ -79,10 +68,15 @@ size_t as_get_size(as_t* as) {
 /** Destroy given address space, freeing all the memory. */
 void as_destroy(as_t* as) {
     bool ipl = interrupts_disable();
-    list_foreach(as_list, as_item_t, my_list_link, item) {
-        if (item->as == as) {
-            list_remove(&item->my_list_link);
-            kfree(item->as);
+    for (size_t i = 1; i < as_container.last_index; i++) {
+        if (as == &as_container.arr[i]) {
+            uintptr_t phys = as_container.arr[i].phys;
+            for (size_t j = i; i < as_container.last_index - 1; j++) {
+                as_container.arr[j] = as_container.arr[j + 1];
+            }
+            as_container.last_index--;
+            frame_free(as_container.arr[i].size / PAGE_SIZE, phys);
+            return;
         }
     }
     interrupts_restore(ipl);
@@ -98,5 +92,25 @@ void as_destroy(as_t* as) {
  * @retval ENOENT Mapping does not exist.
  */
 errno_t as_get_mapping(as_t* as, uintptr_t virt, uintptr_t* phys) {
-    return ENOIMPL;
+
+    if (virt == 0x0) {
+        printk("ENOENT at 0x0\n");
+        return ENOENT;
+    }
+
+    if (virt >= as->size + 0x1000) {
+        printk("ENOENT overflow\n");
+        return ENOENT;
+    }
+
+    *phys = as->phys + virt;
+    return EOK;
+}
+
+as_t* find_as(size_t asid) {
+    for (size_t i = 1; i < as_container.last_index; i++) {
+        if (asid == as_container.arr[i].asid)
+            return &as_container.arr[i];
+    }
+    return NULL;
 }

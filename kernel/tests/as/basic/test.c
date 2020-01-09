@@ -47,12 +47,10 @@ static void* as_worker(void* unused) {
     printk("%u pages: checking range [%p, %p)\n", size_pages, data, data_end);
 
     for (uint8_t* it = data; it < data_end; it += STEP) {
-        printk("It: %p, until %p\n", it, data_end);
         *it = get_value_at_addr((uintptr_t)it);
     }
     printk("Got through first for cycle\n");
     for (uint8_t* it = data; it < data_end; it += STEP) {
-        printk("It: %p, until %p\n", it, data_end);
         uint8_t expected = get_value_at_addr((uintptr_t)it);
         uint8_t actual = *it;
         ktest_assert(expected == actual, "value mismatch");
@@ -89,15 +87,11 @@ void kernel_test(void) {
             break;
         }
         ktest_assert_errno(err, "thread_create");
+        printk("In %u join\n", i);
         err = thread_join(worker, NULL);
-        printk("Out of %u-th join\n", i);
+        printk("Out %u join\n", i);
         ktest_assert(err == EKILLED, "thread_join should signal killed thread (got %s)", errno_as_str(err));
-        if (accessible_memory_ok)
-            printk("Accessible memory ok true\n");
-        else
-            printk("Accessible memory ok false\n");
         ktest_assert(accessible_memory_ok, "thread killed when touching mapped memory");
-        printk("Survived accessible_memory_ok assert\n");
     }
 
     ktest_passed();

@@ -308,11 +308,11 @@ void thread_switch_to(thread_t* thread) {
         }
 
         thread->status = RUNNING;
-        cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
+        cpu_switch_context(NULL, (void**)&thread->stack_top, thread->address_space->asid);
     } else {
         thread->status = RUNNING;
         rotate(current_thread);
-        cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
+        cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, thread->address_space->asid);
     }
     interrupts_restore(ipl);
 }

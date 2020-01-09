@@ -28,4 +28,5 @@ errno_t frame_alloc(size_t count, uintptr_t* phys);
 errno_t frame_free(size_t count, uintptr_t phys);
 
 void print_frame_array(void);
+size_t allign_to_4k(size_t value);
 #endif

@@ -9,14 +9,6 @@
 #include <mm/heap.h>
 #include <types.h>
 
-void print_frame_array(void) {
-    printk("Printing array...\n");
-    for (size_t i = 0; i < frame_container.last_index; i++) {
-        printk("%u-th frame with phys: %p\n", i, frame_container.arr[i].phys);
-    }
-    printk("Done printing array...\n");
-}
-
 /**
  * Initializes frame allocator.
  *
@@ -26,7 +18,6 @@ void frame_init(void) {
     bool ipl = interrupts_disable();
     frame_container.arr[0] = (frame_t){ START_ADD };
     frame_container.last_index = 1;
-    print_frame_array();
     interrupts_restore(ipl);
 }
 
@@ -38,7 +29,7 @@ static size_t find_place_for_new_alloc(size_t address) {
     return frame_container.last_index - 1;
 }
 
-static size_t allign_to_4k(size_t value) {
+size_t allign_to_4k(size_t value) {
     return value + (FRAME_SIZE - (value % FRAME_SIZE));
 }
 
@@ -79,32 +70,25 @@ static size_t find_place_on_heap(size_t count) {
 errno_t frame_alloc(size_t count, uintptr_t* phys) {
     bool ipl = interrupts_disable();
     if (frame_container.last_index + count >= ARR_LEN) {
-        // printk("Frame array full\n");
         return ENOMEM;
     }
 
     if (heap.last_index + count >= ARR_LENGTH) {
-        // printk("Heap array full\n");
         return ENOMEM;
     }
 
     if (frame_container.arr[frame_container.last_index - 1].phys + count * FRAME_SIZE >= 0x20000000) {
-        // printk("Out of mem bounds\n");
         return ENOMEM;
     }
 
     size_t required_mem = FRAME_SIZE * count;
     if (required_mem > mem_left) {
-        printk("ENOMEM in frame_alloc\n");
         return ENOMEM;
     }
 
     size_t starting_address = find_place_on_heap(count);
 
     size_t starting_index = find_place_for_new_alloc(starting_address);
-
-    // printk("Malloc start, heap add %p, frame add %p, count %u\n", starting_address + DIFF, starting_address, count);
-    // print_frame_array();
 
     for (size_t i = frame_container.last_index - 1; i > starting_index; i--) {
         frame_container.arr[i + count] = frame_container.arr[i];
@@ -118,8 +102,6 @@ errno_t frame_alloc(size_t count, uintptr_t* phys) {
     frame_container.last_index += count;
 
     *phys = starting_address;
-    // printk("Malloc end\n");
-    // print_frame_array();
     interrupts_restore(ipl);
     return EOK;
 }
@@ -149,18 +131,12 @@ errno_t frame_free(size_t count, uintptr_t phys) {
     }
 
     if (starting_index == ARR_LEN + 1) {
-        // printk("Looking for phys %p, not found\n", phys);
         return ENOENT;
     }
 
     if (starting_index + count > frame_container.last_index) {
-        // printk("Asked to free frames over array bounds\n");
         return EBUSY;
     }
-
-    // printk("Free start, freeing %u from %p on index start %u\n", count, phys, starting_index);
-    // if (phys == 0xb000)
-    //     print_frame_array();
 
     for (size_t i = starting_index; i < frame_container.last_index - 1 - count; i++) {
         frame_container.arr[i] = frame_container.arr[i + count];
