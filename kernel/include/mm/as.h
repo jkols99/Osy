@@ -32,4 +32,5 @@ void as_destroy(as_t* as);
 errno_t as_get_mapping(as_t* as, uintptr_t virt, uintptr_t* phys);
 
 as_t* find_as(size_t asid);
+void print_as_container(void);
 #endif

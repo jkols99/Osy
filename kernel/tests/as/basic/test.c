@@ -67,6 +67,7 @@ static void* as_worker(void* unused) {
     /*
      * Cause fault at next page.
      */
+    printk("Pre-fault print\n");
     *data_end = 0xff;
 
     printk("%u: Survived touching unmapped memory.\n", size_pages);

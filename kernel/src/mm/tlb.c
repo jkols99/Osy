@@ -11,16 +11,19 @@
 void handle_tlb_refill(context_t* context) {
     bool ipl = interrupts_disable();
 
-    printk("in tlb refill\n");
     thread_t* current_thread = get_current_thread();
     as_t* current_as = thread_get_as(current_thread);
+
+    if (current_as == NULL) {
+        thread_kill(current_thread);
+        return;
+    }
 
     size_t phys;
     errno_t err = as_get_mapping(current_as, context->badva, &phys);
     if (err != EOK) {
         thread_kill(current_thread);
     }
-    printk("Thread not killed\n");
     size_t virtual_address = context->badva & 0xfffff000;
 
     size_t virtual_even = 0;
@@ -29,7 +32,6 @@ void handle_tlb_refill(context_t* context) {
     else
         virtual_even = virtual_address - PAGE_SIZE;
 
-    printk("Even addr: %p\n", virtual_even);
     size_t even_mapping;
     size_t odd_mapping;
     errno_t even_err = as_get_mapping(current_as, virtual_even, &even_mapping);

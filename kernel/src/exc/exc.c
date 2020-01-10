@@ -4,9 +4,15 @@
 #include <drivers/timer.h>
 #include <exc.h>
 #include <lib/print.h>
+#include <mm/tlb.h>
 #include <proc/thread.h>
 
 void handle_exception_general(context_t* context) {
+    int exception_code_value = cp0_cause_get_exc_code(context->cause);
+    if (exception_code_value > 0 && exception_code_value < 4) {
+        handle_tlb_refill(context);
+        return;
+    }
     if (cp0_cause_is_interrupt_pending(context->status, 7)) {
         timer_interrupt_after(10000000);
         thread_yield();

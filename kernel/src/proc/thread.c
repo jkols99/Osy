@@ -277,7 +277,9 @@ errno_t thread_join(thread_t* thread, void** retval) {
     thread->follower = current_thread;
     current_thread->following = thread;
     thread_get_current()->status = WAITING;
+    printk("Before switch\n");
     thread_switch_to(thread);
+    printk("Returned from switch\n");
     if (retval != NULL) {
         *retval = retvalue;
     }
@@ -389,13 +391,14 @@ errno_t thread_kill(thread_t* thread) {
 
     remove_all_dependencies(queue, thread_to_kill);
     scheduler_remove_thread(thread_to_kill);
-
     thread_to_kill->status = KILLED;
     thread_to_kill->follower = NULL;
     thread_to_kill->following = NULL;
+    if (thread_to_kill->address_space != NULL) {
+        as_destroy(thread_to_kill->address_space);
+    }
     kfree(thread_to_kill);
     thread_to_kill = NULL;
-
     if (thread == current_thread) {
         interrupts_restore(ipl);
         scheduler_schedule_next();

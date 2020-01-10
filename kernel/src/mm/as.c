@@ -19,7 +19,7 @@ void as_init(void) {
     interrupts_restore(ipl);
 }
 
-static void print_as_container() {
+void print_as_container() {
     for (size_t i = 0; i < as_container.last_index; i++) {
         as_t ith_as = as_container.arr[i];
         printk("As with phys mapped to %p, size %u, and asid %u\n", ith_as.phys, ith_as.size, ith_as.asid);
@@ -92,14 +92,11 @@ void as_destroy(as_t* as) {
  * @retval ENOENT Mapping does not exist.
  */
 errno_t as_get_mapping(as_t* as, uintptr_t virt, uintptr_t* phys) {
-
     if (virt == 0x0) {
-        printk("ENOENT at 0x0\n");
         return ENOENT;
     }
 
-    if (virt >= as->size + 0x1000) {
-        printk("ENOENT overflow\n");
+    if (virt >= as->size) {
         return ENOENT;
     }
 
