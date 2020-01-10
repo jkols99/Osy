@@ -283,9 +283,7 @@ errno_t thread_join(thread_t* thread, void** retval) {
     thread->follower = current_thread;
     current_thread->following = thread;
     thread_get_current()->status = WAITING;
-    printk("Before switch\n");
     thread_switch_to(thread);
-    printk("Returned from switch\n");
     if (retval != NULL) {
         *retval = retvalue;
     }

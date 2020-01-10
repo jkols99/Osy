@@ -15,7 +15,6 @@ void handle_tlb_refill(context_t* context) {
     as_t* current_as = thread_get_as(current_thread);
 
     if (current_as == NULL) {
-        thread_kill(current_thread);
         return;
     }
 
