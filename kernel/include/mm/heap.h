@@ -22,6 +22,7 @@ typedef struct my_heap {
 struct my_heap heap;
 size_t mem_left;
 size_t biggest_gap_index;
+size_t start_address;
 
 void* kmalloc(size_t size);
 void kfree(void* ptr);

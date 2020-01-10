@@ -95,8 +95,9 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     bool ipl = interrupts_disable();
     thread_t* new_thread = (thread_t*)kmalloc(sizeof(thread_t));
 
-    if (new_thread == NULL)
+    if (new_thread == NULL) {
         return ENOMEM;
+    }
 
     for (size_t i = 0; i < THREAD_NAME_MAX_LENGTH; i++) {
         if (name == NULL)
@@ -111,8 +112,11 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     new_thread->follower = NULL;
 
     new_thread->stack = kmalloc(THREAD_STACK_SIZE);
-    if (new_thread->stack == NULL)
+    if (new_thread->stack == NULL) {
+        kfree(new_thread);
+        interrupts_restore(ipl);
         return ENOMEM;
+    }
     new_thread->stack_top = (void*)((uintptr_t)new_thread->stack + THREAD_STACK_SIZE - sizeof(context_t));
     context_t* context = (context_t*)new_thread->stack_top;
     context->status = 0xff01;
@@ -146,6 +150,8 @@ thread_t* thread_get_current(void) {
 void thread_yield(void) {
     bool ipl = interrupts_disable();
     thread_t* current_thread = get_current_thread();
+    if (current_thread == NULL)
+        printk("Null curr thread\n");
     current_thread->status = READY;
     rotate(current_thread);
     scheduler_schedule_next();
@@ -310,11 +316,18 @@ void thread_switch_to(thread_t* thread) {
         }
 
         thread->status = RUNNING;
-        cpu_switch_context(NULL, (void**)&thread->stack_top, thread->address_space->asid);
+        if (thread->address_space == NULL)
+            cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
+        else
+            cpu_switch_context(NULL, (void**)&thread->stack_top, thread->address_space->asid);
     } else {
         thread->status = RUNNING;
         rotate(current_thread);
-        cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, thread->address_space->asid);
+        // printk("Switching from %s to %s\n", current_thread->name, thread->name);
+        if (thread->address_space == NULL)
+            cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
+        else
+            cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, thread->address_space->asid);
     }
     interrupts_restore(ipl);
 }
@@ -340,9 +353,14 @@ void thread_switch_to(thread_t* thread) {
 errno_t thread_create_new_as(thread_t** thread_out, thread_entry_func_t entry, void* data, unsigned int flags, const char* name, size_t as_size) {
     bool ipl = interrupts_disable();
     errno_t ret_val = thread_create(thread_out, entry, data, flags, name);
+    if (ret_val == ENOMEM) {
+        printk("But thread was null\n");
+        interrupts_restore(ipl);
+        return ENOMEM;
+    }
     (*thread_out)->address_space = as_create(as_size, 0);
     if ((*thread_out)->address_space == NULL) {
-        printk("But was null\n");
+        printk("But as was null\n");
         interrupts_restore(ipl);
         return ENOMEM;
     }

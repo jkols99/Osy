@@ -73,6 +73,7 @@ void sem_wait(sem_t* sem) {
  * 
  * @param sem Semaphore to be unlocked.
  */
+
 void sem_post(sem_t* sem) {
     bool ipl = interrupts_disable();
     if (sem->value > 0 && queue_size(sem->thread_queue) > 0) {

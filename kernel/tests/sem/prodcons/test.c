@@ -10,9 +10,9 @@
 
 #include <ktest.h>
 #include <lib/print.h>
+#include <lib/queue.h>
 #include <proc/sem.h>
 #include <proc/thread.h>
-#include <lib/queue.h>
 
 #define LOOPS 100
 #define BASE_COUNT 15
@@ -95,6 +95,36 @@ static void spawn_workers(size_t producers, size_t consumers) {
 
 static void let_them_work() {
     for (int i = 0; i < WAIT_LOOPS; i++) {
+        // if (active_threads == 1) {
+        //     printk("Printing scheduler queue:\n");
+        //     qnode_t* tmp = queue->front;
+        //     while (1) {
+        //         if (tmp == NULL)
+        //             break;
+        //         thread_t* t = tmp->key;
+        //         printk("Thread name: %s, status %d\n", t->name, t->status);
+        //         tmp = tmp->next;
+        //     }
+        //     printk("Printing sem full queue:\n");
+        //     qnode_t* tmp2 = queue_full.thread_queue->front;
+        //     while (1) {
+        //         if (tmp2 == NULL)
+        //             break;
+        //         thread_t* t = tmp2->key;
+        //         printk("Thread name: %s, status %d\n", t->name, t->status);
+        //         tmp2 = tmp2->next;
+        //     }
+        //     printk("Printing sem empty queue:\n");
+        //     qnode_t* tmp3 = queue_empty.thread_queue->front;
+        //     while (1) {
+        //         if (tmp3 == NULL)
+        //             break;
+        //         thread_t* t = tmp3->key;
+        //         printk("Thread name: %s, status %d\n", t->name, t->status);
+        //         tmp3 = tmp3->next;
+        //     }
+        //     printk("Done printing...");
+        // }
         thread_yield();
     }
 }
@@ -129,15 +159,15 @@ void kernel_test(void) {
 
         let_them_work();
     }
- 
+
+    printk("Broke from while(true)\n");
 
     for (size_t i = 0; i < producer_thread_count; i++) {
-        printk("First for: Index is %u\n", i);
         err = thread_join(producer_threads[i], NULL);
         ktest_assert_errno(err, "thread_join(producer)");
     }
+
     for (size_t i = 0; i < consumer_thread_count; i++) {
-        printk("Second for: Index is %u\n", i);
         err = thread_join(consumer_threads[i], NULL);
         ktest_assert_errno(err, "thread_join(producer)");
     }
@@ -147,4 +177,3 @@ void kernel_test(void) {
 
     ktest_passed();
 }
-

@@ -94,6 +94,6 @@ void kernel_test(void) {
         ktest_assert(err == EKILLED, "thread_join should signal killed thread (got %s)", errno_as_str(err));
         ktest_assert(accessible_memory_ok, "thread killed when touching mapped memory");
     }
-
+    printk("ktest passed\n");
     ktest_passed();
 }

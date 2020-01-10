@@ -53,17 +53,16 @@ static size_t exhaust_and_free(void) {
         block->count = allocation_size;
         block->phys = phys;
         block->previous = previous_block;
+        printk("Block count %u, block phys %p\n", block->count, block->phys);
         previous_block = block;
     }
     printk("Out of first while(1)\n");
+    print_array();
     dprintk("Freeing it back (starting at %p)\n", previous_block);
-    // print_frame_array();
-    // print_array();
-    // Free it back
     while (previous_block != NULL) {
         block_t* temp = previous_block;
-        previous_block = previous_block->previous;
         printk("Freeing %u blocks from %p add\n", temp->count, temp->phys);
+        previous_block = previous_block->previous;
         errno_t err = frame_free(temp->count, temp->phys);
         ktest_assert_errno(err, "frame_free");
     }

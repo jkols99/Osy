@@ -94,9 +94,10 @@ size_t count_biggest_free_block(void) {
 void heap_init(void) {
     bool ipl = interrupts_disable();
     mem_left = debug_get_base_memory_size();
-    size_t start_address = (size_t)&_kernel_end;
+    start_address = (size_t)&_kernel_end;
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
+    printk("Memory: [%p,%p)\n", start_address, start_address + mem_left);
     interrupts_restore(ipl);
 }
 

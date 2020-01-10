@@ -47,6 +47,7 @@ as_t* as_create(size_t size, unsigned int flags) {
     uintptr_t phys;
     errno_t err = frame_alloc(alligned_size / FRAME_SIZE, &phys);
     if (err == ENOMEM) {
+        print_frame_array();
         printk("ENOMEM for new as\n");
         interrupts_restore(ipl);
         return NULL;

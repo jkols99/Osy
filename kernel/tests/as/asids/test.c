@@ -8,6 +8,7 @@
 #include <drivers/machine.h>
 #include <ktest.h>
 #include <mm/as.h>
+#include <mm/frame.h>
 #include <proc/sem.h>
 #include <proc/thread.h>
 
@@ -30,26 +31,30 @@ static volatile bool worker_can_run = false;
 
 static void* as_worker(void* info_arg) {
     worker_info_t* info = info_arg;
-
-    sem_wait(&started_worker_counter);
+    printk("1\n");
+    // // sem_wait(&started_worker_counter);
 
     while (!worker_can_run) {
         thread_yield();
     }
 
+    // printk("2\n");
     volatile unative_t* data = (unative_t*)(PAGE_SIZE);
 
+    // printk("3\n");
     unative_t i = 0;
+    // printk("Before dowhile\n");
     do {
         unative_t expected_pattern = info->pattern ^ i;
         *data = expected_pattern;
-
+        // printk("Before yield\n");
         thread_yield();
-
+        // printk("Ktest assert before\n");
         ktest_assert(*data == expected_pattern,
                 "%pT: value mismatch (base_pattern=0x%x, i=0x%x, actual=0x%x, expected=0x%x)",
                 info->thread, info->pattern, i, *data, expected_pattern);
 
+        // printk("Ktest assert after\n");
         i++;
     } while (i < LOOPS);
 
@@ -67,11 +72,11 @@ void kernel_test(void) {
         err = thread_create_new_as(&worker_info[i].thread, as_worker, &worker_info[i], 0, "worker", PAGE_SIZE * 2);
         ktest_assert_errno(err, "thread_create");
     }
-
-    while (sem_trywait(&started_worker_counter) != EBUSY) {
-        sem_post(&started_worker_counter);
-    }
-
+    printk("Before the sem while\n");
+    // while (sem_trywait(&started_worker_counter) != EBUSY) {
+    //     sem_post(&started_worker_counter);
+    // }
+    printk("Past the sem while...\n");
     dprintk("All workers are up.\n");
     worker_can_run = true;
 
