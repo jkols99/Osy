@@ -3,6 +3,7 @@
 
 #include <adt/list.h>
 #include <debug/mm.h>
+#include <drivers/machine.h>
 #include <exc.h>
 #include <lib/print.h>
 #include <mm/frame.h>
@@ -54,10 +55,36 @@ static size_t find_place_on_heap(size_t count) {
     }
     size_t last_offset = heap.arr[heap.last_index - 1].address + heap.arr[heap.last_index - 1].mem_amount;
     size_t last_start_address = allign_to_4k(last_offset);
-
+    if (last_offset + count * FRAME_SIZE >= first_offset_outside_memory) {
+        return 0;
+    }
     kmalloc_at(heap.last_index - 1, count, last_start_address);
     return last_start_address - DIFF;
 }
+
+// static void check_overlaps() {
+//     for (size_t i = 1; i < frame_container.last_index; i++) {
+//         for (size_t j = i + 1; j < frame_container.last_index; j++) {
+//             if (frame_container.arr[i].phys == frame_container.arr[j].phys) {
+//                 printk("Overlap on indices %u and %u\n", i, j);
+//                 print_frame_array();
+//                 machine_halt();
+//             }
+//         }
+//     }
+// }
+
+// static void check_sort_invariant() {
+//     for (size_t i = 1; i < frame_container.last_index - 1; i++) {
+//         frame_t f1 = frame_container.arr[i];
+//         frame_t f2 = frame_container.arr[i + 1];
+//         if (f1.phys > f2.phys) {
+//             printk("Not sorted on indices %u and %u\n", i, i + 1);
+//             print_frame_array();
+//             machine_halt();
+//         }
+//     }
+// }
 
 /**
  * Allocate continuous sequence of physical frames.
@@ -92,8 +119,17 @@ errno_t frame_alloc(size_t count, uintptr_t* phys) {
 
     size_t starting_address = find_place_on_heap(count);
 
+    if (starting_address == 0) {
+        printk("Allocation would jump out of memory\n");
+        return ENOMEM;
+    }
+
     size_t starting_index = find_place_for_new_alloc(starting_address);
 
+    // printk("Frame alloc with count %u at phys %p from index %u\n", count, starting_address, starting_index);
+    // printk("Pre-malloc application frame print start\n");
+    // print_frame_array();
+    // printk("Pre-malloc application frame print ended\n");
     for (size_t i = frame_container.last_index - 1; i > starting_index; i--) {
         frame_container.arr[i + count] = frame_container.arr[i];
     }
@@ -102,10 +138,15 @@ errno_t frame_alloc(size_t count, uintptr_t* phys) {
         frame_container.arr[starting_index + 1 + i] = (frame_t){ starting_address + FRAME_SIZE * i };
     }
 
-    mem_left -= count * FRAME_SIZE;
+    mem_left -= required_mem;
     frame_container.last_index += count;
 
     *phys = starting_address;
+    // check_sort_invariant();
+    // check_overlaps();
+    // printk("After malloc print start\n");
+    // print_frame_array();
+    // printk("After malloc print end\n");
     interrupts_restore(ipl);
     return EOK;
 }
@@ -142,7 +183,9 @@ errno_t frame_free(size_t count, uintptr_t phys) {
         return EBUSY;
     }
 
-    for (size_t i = starting_index; i < frame_container.last_index - 1 - count; i++) {
+    // printk("Freeing %u frames from %p from indices [%u, %u)\n", count, phys, starting_index, starting_index + count);
+    // printk("For cycle from %u to %u\n", starting_index, frame_container.last_index - 1 - count);
+    for (size_t i = starting_index; i < frame_container.last_index - count; i++) {
         frame_container.arr[i] = frame_container.arr[i + count];
     }
 

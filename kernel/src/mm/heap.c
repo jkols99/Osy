@@ -90,14 +90,15 @@ size_t count_biggest_free_block(void) {
     }
 }
 
-//initializes important global variables required to run this allocator 256 1024 4098
+//initializes important global variables required to run this allocator
 void heap_init(void) {
     bool ipl = interrupts_disable();
     mem_left = debug_get_base_memory_size();
     start_address = (size_t)&_kernel_end;
     heap.arr[0] = (struct mem_chunk){ 0, start_address };
     heap.last_index = 1;
-    printk("Memory: [%p,%p)\n", start_address, start_address + mem_left);
+    first_offset_outside_memory = start_address + mem_left;
+    printk("Memory: [%p,%p)\n", start_address, first_offset_outside_memory);
     interrupts_restore(ipl);
 }
 
