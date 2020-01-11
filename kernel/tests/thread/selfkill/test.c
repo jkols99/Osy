@@ -20,7 +20,7 @@ void kernel_test(void) {
     ktest_start("thread/selfkill");
 
     thread_t* worker;
-    errno_t err = thread_create_new_as(&worker, suicide_worker, NULL, 0, "suicide", 4096);
+    errno_t err = thread_create(&worker, suicide_worker, NULL, 0, "suicide");
 
     ktest_assert_errno(err, "thread_create");
     err = thread_join(worker, NULL);

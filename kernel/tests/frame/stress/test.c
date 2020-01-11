@@ -485,15 +485,7 @@ static void check_block(mem_block_t* blk) {
     uint8_t *pos, *end;
 
     for (pos = blk->addr, end = pos + blk->size; pos < end; pos++) {
-        bool x = (*pos == expected_value(blk, pos));
-        if (!x) {
-            printk("Mem_left is:%u\n", mem_left);
-            printk("Frames:\n");
-            print_frame_array();
-            printk("Heap:\n");
-            print_array();
-        }
-        ktest_assert(x,
+        ktest_assert(*pos == expected_value(blk, pos),
                 "corrupted content at %p (expected 0x%x, got 0x%x)",
                 pos, *pos, expected_value(blk, pos));
     }
