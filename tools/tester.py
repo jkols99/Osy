@@ -389,7 +389,7 @@ def main():
                 'type': 'kernel',
                 'name': test
             })
-    if config.action == 'userspace':
+    elif config.action == 'userspace':
         for test in config.test_names:
             tests.append({
                 'type': 'userspace',
