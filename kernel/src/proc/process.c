@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <proc/process.h>
+#include <proc/thread.h>
 
 /** Create new userspace process.
  *
@@ -16,7 +17,20 @@
  * @retval EINVAL Invalid call (unaligned size etc.).
  */
 errno_t process_create(process_t** process_out, uintptr_t image_location, size_t image_size, size_t process_memory_size) {
-    return ENOIMPL;
+    if (image_location == NULL || image_size == NULL || process_memory_size < image_size) {
+        return EINVAL;
+    }
+
+    thread_t thread;
+    errno_t err = thread_create(thread, NULL, NULL, 0, "Thread for process"); // TODO not sure about entry, data NULL
+    if (err == ENOMEM) {
+        return ENOMEM;
+    }
+
+    // TODO allocate memory for new process
+    process_t process = { thread, image_location, image_size, process_memory_size};
+    process_out = process;
+    return EOK;
 }
 
 /** Wait for termination of another process.
@@ -30,5 +44,6 @@ errno_t process_create(process_t** process_out, uintptr_t image_location, size_t
  * @retval EINVAL Invalid process.
  */
 errno_t process_join(process_t* process, int* exit_status) {
+    // TODO bude treba asi queue pre procesy
     return ENOIMPL;
 }
