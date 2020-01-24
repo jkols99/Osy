@@ -2,21 +2,21 @@
 // Copyright 2019 Charles University
 
 #include <debug/code.h>
+#include <drivers/machine.h>
 #include <errno.h>
 #include <exc.h>
 #include <lib/print.h>
 #include <mm/as.h>
 #include <mm/heap.h>
 #include <proc/context.h>
+#include <proc/process.h>
 #include <proc/scheduler.h>
 
 /** Initialize support for threading.
  *
  * Called once at system boot.
  */
-void threads_init(void) {
-    //unneccessary...
-}
+void threads_init(void) {}
 
 static void* retvalue;
 
@@ -110,6 +110,7 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
     new_thread->status = READY;
     new_thread->following = NULL;
     new_thread->follower = NULL;
+    new_thread->is_userspace = (flags == 1);
 
     new_thread->stack = kmalloc(THREAD_STACK_SIZE);
     if (new_thread->stack == NULL) {
@@ -127,7 +128,14 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
 
     *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
-
+    qnode_t* temp = queue->front;
+    printk("Thread name:, status\n");
+    while (1) {
+        if (temp == NULL)
+            break;
+        printk("Thread name: %s, status %u\n", temp->key->name, temp->key->status);
+        temp = temp->next;
+    }
     interrupts_restore(ipl);
     return EOK;
 }
@@ -415,11 +423,23 @@ errno_t thread_kill(thread_t* thread) {
     }
     kfree(thread_to_kill);
     thread_to_kill = NULL;
+    qnode_t* temp = queue->front;
+    size_t count = 0;
+    while (1) {
+        if (temp == NULL)
+            break;
+        printk("Thread name: %s, status %u\n", temp->key->name, temp->key->status);
+        temp = temp->next;
+    }
     if (thread == current_thread) {
+        printk("==\n");
+        if (count == 1)
+            machine_halt();
         interrupts_restore(ipl);
         scheduler_schedule_next();
         return EOK;
     } else {
+        printk("!=\n");
         interrupts_restore(ipl);
         return EOK;
     }

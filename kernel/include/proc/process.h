@@ -26,17 +26,36 @@
 #error "Cannot give less memory than image size!"
 #endif
 
-/** Information about existing process. */
 typedef struct {
-    thread_t thread;
-    uintptr_t image_location;
-    size_t image_size;
-    size_t process_memory_size;
+    unative_t id;
+    size_t virt_mem_size;
+    size_t total_ticks;
+} np_proc_info_t;
+
+typedef enum {
+    SYSCALL_EXIT,
+    SYSCALL_PRINT_CHAR,
+    SYSCALL_PROC_INFO,
+    SYSCALL_PROC_MEM,
+    SYSCALL_LAST
+} syscall_t;
+
+typedef struct process process_t;
+
+/** Information about existing process. */
+struct process {
+    thread_t* thread;
+    status_t status;
+    np_proc_info_t proc_info;
     process_t* following; // process i am waiting for
     process_t* follower; // process that is waiting for me
-} process_t;
+};
 
+process_t* current_process;
+
+inline process_t* get_current_process(void) { return current_process; }
 errno_t process_create(process_t** process, uintptr_t image_location, size_t image_size, size_t process_memory_size);
 errno_t process_join(process_t* process, int* exit_status);
+void process_kill(void);
 
 #endif

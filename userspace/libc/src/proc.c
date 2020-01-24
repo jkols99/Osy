@@ -2,6 +2,7 @@
 // Copyright 2019 Charles University
 
 #include <np/proc.h>
+#include <np/syscall.h>
 
 /** Get information about current process.
  *
@@ -19,5 +20,16 @@
  * @return Whether the call was successful.
  */
 bool np_proc_info_get(np_proc_info_t* info) {
-    return false;
+    if (info == NULL)
+        return false;
+
+    size_t size;
+    __SYSCALL1(SYSCALL_PROC_MEM, (unative_t)&size);
+
+    if ((size_t)info + sizeof(np_proc_info_t) > size)
+        return false;
+
+    __SYSCALL1(SYSCALL_PROC_INFO, (unative_t)info);
+
+    return (info != NULL);
 }

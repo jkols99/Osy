@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Charles University
 
+#include <../../../kernel/include/drivers/printer.h>
 #include <np/syscall.h>
 #include <stdio.h>
-#include <../../../kernel/include/drivers/printer.h>
 
 /** Print single character to console.
  *
@@ -11,7 +11,7 @@
  * @return Character written as an unsigned char cast to an int.
  */
 int putchar(int c) {
-    printer_putchar('a'); // TODO malo by tu byt namiesto 'a', c* ale mi to nefunguje
+    printer_putchar(c); // TODO malo by tu byt namiesto 'a', c* ale mi to nefunguje
     return c;
 }
 

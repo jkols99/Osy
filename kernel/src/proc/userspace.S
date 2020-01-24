@@ -19,7 +19,7 @@
  *
  * The jump is done via setting status register to emulate exception handling,
  * setting EPC and stack pointer and then calling ERET that jumps back
- * (actually forward ;-) to userspace.
+ * (actually forward ;-)) to userspace.
  */
 
 .globl cpu_jump_to_userspace

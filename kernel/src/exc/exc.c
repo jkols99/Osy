@@ -5,6 +5,7 @@
 #include <exc.h>
 #include <lib/print.h>
 #include <mm/tlb.h>
+#include <proc/process.h>
 #include <proc/thread.h>
 
 void handle_exception_general(context_t* context) {
@@ -13,10 +14,13 @@ void handle_exception_general(context_t* context) {
         handle_tlb_refill(context);
         return;
     }
+
     if (cp0_cause_is_interrupt_pending(context->status, 7)) {
         timer_interrupt_after(10000000);
         thread_yield();
     }
+
+    process_kill();
 }
 
 bool interrupts_disable(void) {

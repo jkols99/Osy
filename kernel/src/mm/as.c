@@ -52,7 +52,6 @@ as_t* as_create(size_t size, unsigned int flags) {
         interrupts_restore(ipl);
         return NULL;
     }
-    printk("Next asid %u\n", next_asid);
     as_container.arr[as_container.last_index++] = (as_t){ alligned_size, next_asid++, phys };
 
     print_as_container();

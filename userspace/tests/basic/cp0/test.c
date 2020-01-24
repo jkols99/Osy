@@ -13,7 +13,6 @@
 int main(void) {
     utest_start("basic/cp0");
     utest_expect_abort();
-
     __asm__ volatile("mtc0 $a0, $12\n");
 
     printf("Survived access to control coprocessor.\n");

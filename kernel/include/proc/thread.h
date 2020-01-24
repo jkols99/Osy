@@ -46,6 +46,7 @@ struct thread {
     thread_t* following; // thread i am waiting for
     thread_t* follower; // thread that is waiting for me
     as_t* address_space;
+    bool is_userspace;
 };
 void kill_thread(bool run_next, bool corrupted);
 void threads_init(void);

@@ -11,6 +11,19 @@
         "types.h": "c",
         "code.h": "c",
         "frame.h": "c",
-        "heap.h": "c"
+        "heap.h": "c",
+        "thread.h": "c",
+        "errno.h": "c",
+        "process.h": "c",
+        "syscall.h": "c",
+        "proc.h": "c",
+        "stdbool.h": "c",
+        "stdint.h": "c",
+        "scheduler.h": "c",
+        "context.h": "c",
+        "print.h": "c",
+        "queue.h": "c",
+        "stddef.h": "c",
+        "stdio.h": "c"
     }
 }
