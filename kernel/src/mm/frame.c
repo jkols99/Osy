@@ -36,6 +36,8 @@ static size_t find_place_for_new_alloc(size_t address) {
 }
 
 size_t allign_to_4k(size_t value) {
+    if (value % FRAME_SIZE == 0)
+        return value;
     return value + (FRAME_SIZE - (value % FRAME_SIZE));
 }
 

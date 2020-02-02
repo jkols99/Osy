@@ -1,5 +1,5 @@
-src/proc/sem.o: src/proc/sem.c include/proc/sem.h include/adt/list.h \
- include/debug.h include/drivers/machine.h include/lib/print.h \
- include/types.h include/errno.h include/lib/queue.h \
- include/proc/thread.h include/proc/context.h include/drivers/cp0.h \
- include/proc/scheduler.h include/exc.h
+src/proc/sem.o: src/proc/sem.c include/exc.h include/proc/context.h \
+ include/drivers/cp0.h include/types.h include/lib/print.h \
+ include/lib/queue.h include/proc/thread.h include/errno.h \
+ include/proc/sem.h include/adt/list.h include/debug.h \
+ include/drivers/machine.h include/proc/scheduler.h

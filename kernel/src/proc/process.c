@@ -4,7 +4,9 @@
 #include <errno.h>
 #include <exc.h>
 #include <lib/print.h>
+#include <mm/as.h>
 #include <mm/frame.h>
+#include <mm/heap.h>
 #include <proc/process.h>
 #include <proc/scheduler.h>
 #include <proc/thread.h>
@@ -12,11 +14,39 @@
 
 size_t id = 0;
 
-void process_kill() {
-    current_process->status = KILLED;
-    printk("1\n");
-    thread_kill(current_process->thread);
-    printk("2\n");
+static void copy_binary_to_virtual(uintptr_t image_location, uintptr_t image_size, uintptr_t start_va) {
+    size_t* image_start = (size_t*)0xBFB01000;
+    size_t* va_start = (size_t*)0x1000;
+    size_t to_be_copied = image_size - 4096;
+    // printk("First value at %p is %p\n", image_start, *image_start);
+    // printk("Va_start at %p\n", va_start);
+    while (to_be_copied > image_size - (4096 * 4)) {
+        va_start++;
+        image_start++;
+        to_be_copied -= sizeof(size_t);
+        // printk("va_start %p, image_start %p, to be copied %u\n", va_start, image_start, to_be_copied);
+    }
+    // printk("Va start: %p, image_Start: %p, to be copied %u, image_size %u\n", va_start, image_start, to_be_copied, image_size);
+    // __asm__ volatile(".insn\n\n.word 0x29\n\n");
+    while (to_be_copied > 0) {
+        *va_start = *image_start;
+        if (*image_start != 0x0) {
+            // printk("Copy init from %p to %p, size %u, to be copied %u\n", image_start, va_start, image_size, to_be_copied);
+            // printk("Data at %p: %p copied from %p\n", va_start, *va_start, *image_start);
+        }
+        va_start++;
+        image_start++;
+        to_be_copied -= sizeof(size_t);
+    }
+    printk("Successful assign\n");
+}
+
+static void* entry(void* data) {
+    printk("In us entry\n");
+    copy_binary_to_virtual(PROCESS_IMAGE_START, PROCESS_IMAGE_SIZE, 0x0);
+    // __asm__ volatile(".insn\n\n.word 0x29\n\n");
+    cpu_jump_to_userspace((uintptr_t)(0x3000), (uintptr_t)PROCESS_ENTRY_POINT);
+    return NULL;
 }
 
 /** Create new userspace process.
@@ -38,22 +68,40 @@ errno_t process_create(process_t** process_out, uintptr_t image_location, size_t
     }
 
     thread_t* thread;
-    errno_t err = thread_create_new_as(&thread, (void* (*)(void*))image_location, NULL, 1, "Thread for process", process_memory_size);
-    qnode_t* temp = queue->front;
-    while (1) {
-        if (temp == NULL)
-            break;
-        printk("Thread name: %s, status %u\n", temp->key->name, temp->key->status);
-        temp = temp->next;
-    }
+    errno_t err = thread_create_new_as(&thread, entry, NULL, 1, "Thread for process", process_memory_size);
     if (err == ENOMEM) {
         interrupts_restore(ipl);
         return ENOMEM;
     }
-    np_proc_info_t info = { id++, allign_to_4k(process_memory_size), 0 };
-    process_t process = { thread, READY, info, NULL, NULL };
-    *process_out = &process;
+    // TODO nakopirovat binarku
+    np_proc_info_t* info = (np_proc_info_t*)kmalloc(sizeof(np_proc_info_t));
+    if (info == NULL) {
+        // kfree(thread->stack);
+        // kfree(thread->address_space);
+        // kfree(thread);
+        interrupts_restore(ipl);
+        return ENOMEM;
+    }
+    info->id = id++;
+    info->virt_mem_size = allign_to_4k(process_memory_size);
+    info->total_ticks = 0;
 
+    process_t* proc = (process_t*)kmalloc(sizeof(process_t));
+    if (proc == NULL) {
+        // kfree(thread->stack);
+        // kfree(thread->address_space);
+        // kfree(thread);
+        // kfree(info);
+        interrupts_restore(ipl);
+        return ENOMEM;
+    }
+    proc->thread = thread;
+    proc->status = READY;
+    proc->proc_info = info;
+    *process_out = proc;
+    proc->thread->data = process_out;
+    size_t* img_loc = (size_t*)image_location;
+    printk("Start byte of img loc %p\n", *img_loc);
     interrupts_restore(ipl);
     return EOK;
 }
@@ -85,20 +133,9 @@ errno_t process_join(process_t* process, int* exit_status) {
         return EKILLED;
     }
 
-    if (process->follower != NULL) {
-        interrupts_restore(ipl);
-        return EBUSY;
-    }
-
-    if (current_process != NULL) {
-        current_process->following = process;
-        process->follower = current_process;
-    }
     current_process = process;
-    set_current_thread(process->thread);
-    printk("Jumping to userspace\n");
-    cpu_jump_to_userspace((uintptr_t)process->thread->stack_top, (uintptr_t)process->thread->entry_func);
+    errno_t join_errno = thread_join(process->thread, NULL);
 
     interrupts_restore(ipl);
-    return EOK;
+    return join_errno;
 }

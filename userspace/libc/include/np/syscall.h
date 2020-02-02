@@ -25,6 +25,7 @@ typedef enum {
     SYSCALL_PRINT_CHAR,
     SYSCALL_PROC_INFO,
     SYSCALL_PROC_MEM,
+    SYSCALL_VIRT_MEM,
     SYSCALL_LAST
 } syscall_t;
 

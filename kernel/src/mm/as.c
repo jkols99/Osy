@@ -19,13 +19,6 @@ void as_init(void) {
     interrupts_restore(ipl);
 }
 
-void print_as_container() {
-    for (size_t i = 0; i < as_container.last_index; i++) {
-        as_t ith_as = as_container.arr[i];
-        printk("As with phys mapped to %p, size %u, and asid %u\n", ith_as.phys, ith_as.size, ith_as.asid);
-    }
-}
-
 /** Create new address space.
  *
  * @param size Address space size, must be aligned to PAGE_SIZE.
@@ -52,12 +45,14 @@ as_t* as_create(size_t size, unsigned int flags) {
         interrupts_restore(ipl);
         return NULL;
     }
-    as_container.arr[as_container.last_index++] = (as_t){ alligned_size, next_asid++, phys };
-
-    print_as_container();
+    as_t* new_as = (as_t*)kmalloc(sizeof(as_t));
+    new_as->size = alligned_size;
+    new_as->asid = next_asid++;
+    new_as->phys = phys;
+    as_container.arr[as_container.last_index++] = *new_as;
 
     interrupts_restore(ipl);
-    return &as_container.arr[as_container.last_index - 1];
+    return new_as;
 }
 
 /** Get size of given address space (in bytes). */
@@ -92,7 +87,8 @@ void as_destroy(as_t* as) {
  * @retval ENOENT Mapping does not exist.
  */
 errno_t as_get_mapping(as_t* as, uintptr_t virt, uintptr_t* phys) {
-    if (virt == 0x0) {
+    printk("Virt: %p, as size: %x, virt actual size: %x\n", virt, as->size, 262144);
+    if (virt < 0x1000) {
         return ENOENT;
     }
 

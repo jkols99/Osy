@@ -10,7 +10,7 @@
 
 void handle_tlb_refill(context_t* context) {
     bool ipl = interrupts_disable();
-
+    // printk("In tlb refill\n");
     thread_t* current_thread = get_current_thread();
     as_t* current_as = thread_get_as(current_thread);
 
@@ -19,10 +19,10 @@ void handle_tlb_refill(context_t* context) {
         kill_thread(current_thread, false);
         return;
     }
-
     size_t phys;
     errno_t err = as_get_mapping(current_as, context->badva, &phys);
     if (err != EOK) {
+        printk("Killing thread\n");
         thread_kill(current_thread);
     }
     size_t virtual_address = context->badva & 0xfffff000;

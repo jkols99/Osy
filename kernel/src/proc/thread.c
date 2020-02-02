@@ -70,8 +70,11 @@ void kill_thread(bool run_next, bool corrupted) {
  * it can proceed to get killed
  */
 static void wrap(thread_t* new_thread) {
+    printk("Tututu\n");
     retvalue = (*new_thread->entry_func)(new_thread->data);
+    printk("Tutu\n");
     kill_thread(true, false);
+    printk("Tu\n");
 }
 
 /** Create a new thread.
@@ -114,7 +117,7 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
 
     new_thread->stack = kmalloc(THREAD_STACK_SIZE);
     if (new_thread->stack == NULL) {
-        kfree(new_thread);
+        // kfree(new_thread);
         interrupts_restore(ipl);
         return ENOMEM;
     }
@@ -128,14 +131,7 @@ errno_t thread_create(thread_t** thread_out, thread_entry_func_t entry, void* da
 
     *thread_out = new_thread;
     scheduler_add_ready_thread(*thread_out);
-    qnode_t* temp = queue->front;
-    printk("Thread name:, status\n");
-    while (1) {
-        if (temp == NULL)
-            break;
-        printk("Thread name: %s, status %u\n", temp->key->name, temp->key->status);
-        temp = temp->next;
-    }
+
     interrupts_restore(ipl);
     return EOK;
 }
@@ -157,6 +153,7 @@ thread_t* thread_get_current(void) {
 */
 void thread_yield(void) {
     bool ipl = interrupts_disable();
+    printk("Interrupted\n");
     thread_t* current_thread = get_current_thread();
     if (current_thread == NULL)
         printk("Null curr thread\n");
@@ -297,6 +294,7 @@ errno_t thread_join(thread_t* thread, void** retval) {
     }
 
     if (thread->status == KILLED) {
+        printk("Ekilled return\n");
         interrupts_restore(ipl);
         return EKILLED;
     }
@@ -316,6 +314,7 @@ void thread_switch_to(thread_t* thread) {
     bool ipl = interrupts_disable();
     thread_t* current_thread = get_current_thread();
     set_current_thread(thread);
+
     if (current_thread == NULL) {
         if (thread == NULL) {
             return;
@@ -323,13 +322,12 @@ void thread_switch_to(thread_t* thread) {
 
         thread->status = RUNNING;
         if (thread->address_space == NULL)
-            cpu_switch_context(NULL, (void**)&thread->stack_top, 1);
+            cpu_switch_context((void**)debug_get_stack_pointer(), (void**)&thread->stack_top, 1);
         else
-            cpu_switch_context(NULL, (void**)&thread->stack_top, thread->address_space->asid);
+            cpu_switch_context((void**)debug_get_stack_pointer(), (void**)&thread->stack_top, thread->address_space->asid);
     } else {
         thread->status = RUNNING;
         rotate(current_thread);
-        // printk("Switching from %s to %s\n", current_thread->name, thread->name);
         if (thread->address_space == NULL)
             cpu_switch_context((void**)&current_thread->stack_top, (void**)&thread->stack_top, 1);
         else
@@ -367,6 +365,7 @@ errno_t thread_create_new_as(thread_t** thread_out, thread_entry_func_t entry, v
     (*thread_out)->address_space = as_create(as_size, 0);
     if ((*thread_out)->address_space == NULL) {
         printk("But as was null\n");
+        // kfree(thread_out);
         interrupts_restore(ipl);
         return ENOMEM;
     }
@@ -423,23 +422,11 @@ errno_t thread_kill(thread_t* thread) {
     }
     kfree(thread_to_kill);
     thread_to_kill = NULL;
-    qnode_t* temp = queue->front;
-    size_t count = 0;
-    while (1) {
-        if (temp == NULL)
-            break;
-        printk("Thread name: %s, status %u\n", temp->key->name, temp->key->status);
-        temp = temp->next;
-    }
     if (thread == current_thread) {
-        printk("==\n");
-        if (count == 1)
-            machine_halt();
         interrupts_restore(ipl);
         scheduler_schedule_next();
         return EOK;
     } else {
-        printk("!=\n");
         interrupts_restore(ipl);
         return EOK;
     }

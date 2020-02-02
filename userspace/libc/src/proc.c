@@ -23,8 +23,7 @@ bool np_proc_info_get(np_proc_info_t* info) {
     if (info == NULL)
         return false;
 
-    size_t size;
-    __SYSCALL1(SYSCALL_PROC_MEM, (unative_t)&size);
+    size_t size = (size_t)__SYSCALL1(SYSCALL_PROC_MEM, 0);
 
     if ((size_t)info + sizeof(np_proc_info_t) > size)
         return false;

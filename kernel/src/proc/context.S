@@ -39,7 +39,7 @@ cpu_switch_context:
      * Allocate a frame on the stack of the old thread and update
      * the address of the stack top of the old thread.
      */
-
+    
     addiu $sp, -CONTEXT_SIZE
     sw $sp, ($a0)
 

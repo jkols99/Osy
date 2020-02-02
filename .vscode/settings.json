@@ -24,6 +24,10 @@
         "print.h": "c",
         "queue.h": "c",
         "stddef.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "exc.h": "c",
+        "timer.h": "c",
+        "utest.h": "c",
+        "stdlib.h": "c"
     }
 }

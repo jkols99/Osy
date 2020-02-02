@@ -1,4 +1,6 @@
 src/proc/thread.o: src/proc/thread.c include/debug/code.h include/types.h \
- include/errno.h include/exc.h include/proc/context.h \
- include/drivers/cp0.h include/lib/print.h include/mm/heap.h \
- include/proc/scheduler.h include/lib/queue.h include/proc/thread.h
+ include/drivers/machine.h include/errno.h include/exc.h \
+ include/proc/context.h include/drivers/cp0.h include/lib/print.h \
+ include/mm/as.h include/adt/list.h include/debug.h include/mm/heap.h \
+ include/proc/process.h include/proc/thread.h include/proc/scheduler.h \
+ include/lib/queue.h

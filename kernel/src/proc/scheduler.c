@@ -57,6 +57,7 @@ void scheduler_schedule_next(void) {
     thread_t* next_thread = get_next_ready(queue, 0);
     if (next_thread == NULL)
         next_thread = get_next_ready(queue, 2);
+
     thread_switch_to(next_thread);
     interrupts_restore(ipl);
 }

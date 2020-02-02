@@ -1,3 +1,4 @@
 src/mm/heap.o: src/mm/heap.c include/debug/code.h include/types.h \
- include/debug/mm.h include/lib/print.h include/main.h include/mm/heap.h \
- include/exc.h include/proc/context.h include/drivers/cp0.h
+ include/debug/mm.h include/exc.h include/proc/context.h \
+ include/drivers/cp0.h include/lib/print.h include/main.h \
+ include/mm/frame.h include/errno.h include/mm/heap.h
